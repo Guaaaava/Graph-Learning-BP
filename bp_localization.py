@@ -178,10 +178,10 @@ def run_simulation():
     # --- 配置参数 ---
     AREA_SIZE = 50
     NUM_ANCHORS = 4
-    NUM_AGENTS = 5
+    NUM_AGENTS = 10
     COMM_RANGE = 35 # 通信半径
     NOISE_STD = 0.5 # 测距噪声标准差
-    ITERATIONS = 50 # 迭代次数
+    ITERATIONS = 100 # 迭代次数
 
     nodes = []
     edges = []
@@ -194,11 +194,9 @@ def run_simulation():
         nodes.append(Node(i, anchors_pos[i], is_anchor=True))
 
     # 2. 生成未知节点 (随机位置)
-    true_agent_positions = []
     for i in range(NUM_AGENTS):
         # 真实位置随机
         true_pos = np.random.rand(2) * AREA_SIZE
-        true_agent_positions.append(true_pos)
         nodes.append(Node(NUM_ANCHORS + i, true_pos, is_anchor=False))
 
     # 3. 生成边 (基于真实距离 + 噪声)
@@ -223,24 +221,45 @@ def run_simulation():
 
     print(f"Graph Created: {len(nodes)} nodes, {len(edges)} edges.")
 
-    # --- 准备绘图 ---
-    fig, ax = plt.subplots(figsize=(8, 8))
-    ax.set_xlim(-10, AREA_SIZE + 10)
-    ax.set_ylim(-10, AREA_SIZE + 10)
+    # --- 准备绘图 (双子图) ---
+    # figsize=(14, 6) 让窗口变宽，容纳两个图
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    
+    # === 左图：定位过程 ===
+    ax1.set_xlim(-10, AREA_SIZE + 10)
+    ax1.set_ylim(-10, AREA_SIZE + 10)
+    ax1.set_title("Real-time Localization")
+    ax1.set_xlabel("X Position (m)")
+    ax1.set_ylabel("Y Position (m)")
+    ax1.grid(True)
     
     # 绘图元素
-    scat_true = ax.scatter([n.true_pos[0] for n in nodes], [n.true_pos[1] for n in nodes], c='g', marker='x', label='True Pos')
-    scat_est = ax.scatter([], [], c='r', marker='o', label='Est BP')
+    scat_true = ax1.scatter([n.true_pos[0] for n in nodes], [n.true_pos[1] for n in nodes], 
+                            c='g', marker='x', s=80, label='True Pos')
+    scat_est = ax1.scatter([], [], c='r', marker='o', label='Est BP')
     lines = [] # 绘制边
 
     # 绘制连接线
     for edge in edges:
-        ln, = ax.plot([], [], 'k-', alpha=0.1)
+        ln, = ax1.plot([], [], 'k-', alpha=0.1)
         lines.append(ln)
+    ax1.legend(loc='upper right')
+
+    # === 右图：误差曲线 ===
+    ax2.set_xlim(0, ITERATIONS)
+    ax2.set_ylim(0, AREA_SIZE/2) # 初始Y轴范围，后续会自动调整
+    ax2.set_title("RMSE Convergence Analysis")
+    ax2.set_xlabel("Iteration Number")
+    ax2.set_ylabel("RMSE Error (m)")
+    ax2.grid(True)
+    
+    # 初始化误差曲线对象
+    rmse_line, = ax2.plot([], [], 'b-o', linewidth=2, label='RMSE')
+    rmse_history = [] # 存储每一轮的 RMSE
+    iter_history = [] # 存储迭代次数
 
     # --- BP 迭代主循环 ---
     def update(frame):
-        print(f"Iteration {frame}...")
         
         # 步骤 A: 计算所有消息 (Variable -> Factor -> Variable)
         # 为了模拟同步BP，我们需要先计算所有边上的新消息，暂存起来，然后再统一放入收件箱
@@ -268,11 +287,27 @@ def run_simulation():
             target_node = next(n for n in nodes if n.id == target_id)
             target_node.incoming_messages[source_id] = (mu, sigma)
 
-        # 步骤 C: 节点更新自己的 Belief
+        # 步骤 C: 节点更新自己的 Belief 并计算误差
         est_positions = []
+        total_error_sq = 0
+        unknown_count = 0
+
         for node in nodes:
             node.update_belief()
             est_positions.append(node.mu)
+
+            # 只计算未知节点的误差
+            if not node.is_anchor:
+                error = norm(node.mu - node.true_pos)
+                total_error_sq += error**2
+                unknown_count += 1
+        
+        # 计算 RMSE (均方根误差)
+        current_rmse = np.sqrt(total_error_sq / unknown_count) if unknown_count > 0 else 0
+
+        # 记录数据用于右图绘制
+        rmse_history.append(current_rmse)
+        iter_history.append(frame)
 
         # --- 更新绘图数据 ---
         est_positions = np.array(est_positions)
@@ -283,13 +318,19 @@ def run_simulation():
             p1 = edge.node_a.mu
             p2 = edge.node_b.mu
             lines[i].set_data([p1[0], p2[0]], [p1[1], p2[1]])
+
+        # --- 更新右图 (误差曲线) ---
+        rmse_line.set_data(iter_history, rmse_history)
+
+        # 动态调整右图 Y 轴范围，防止误差太大跑出画面
+        if frame > 0:
+            ax2.set_ylim(0, max(rmse_history) * 1.1)
             
-        ax.set_title(f"BP Cooperative Localization - Iteration {frame}")
-        return scat_est, *lines
+        print(f"Iter {frame}: RMSE = {current_rmse:.4f} m")
+        return scat_est, rmse_line, *lines
     
-    ani = animation.FuncAnimation(fig, update, frames=ITERATIONS, interval=500, blit=False, repeat=False)
-    plt.legend()
-    plt.grid(True)
+    ani = animation.FuncAnimation(fig, update, frames=ITERATIONS, interval=200, blit=False, repeat=False)
+    plt.tight_layout()
     plt.show()
 
 if __name__ == "__main__":
