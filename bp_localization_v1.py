@@ -176,12 +176,12 @@ class Edge:
 
 def run_simulation():
     # --- 配置参数 ---
-    AREA_SIZE = 50
+    AREA_SIZE = 100
     NUM_ANCHORS = 4
-    NUM_AGENTS = 10
-    COMM_RANGE = 35 # 通信半径
+    NUM_AGENTS = 20
+    COMM_RANGE = 70 # 通信半径
     NOISE_STD = 0.5 # 测距噪声标准差
-    ITERATIONS = 100 # 迭代次数
+    ITERATIONS = 50 # 迭代次数
 
     nodes = []
     edges = []
