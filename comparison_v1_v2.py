@@ -146,8 +146,8 @@ def run_visual_comparison():
     NOISE_STD = 0.5
     ITERATIONS = 40
     
-    # --- 1. 生成上帝视角数据 (保证公平) ---
-    np.random.seed(10) # 固定种子方便复现
+    # --- 1. 生成统一数据 (控制变量) ---
+    np.random.seed(12) # 固定种子方便复现 (15,10,12较为典型)
     anchors_pos = [[0,0], [AREA_SIZE,0], [AREA_SIZE,AREA_SIZE], [0,AREA_SIZE]]
     agents_true_pos = [np.random.rand(2) * AREA_SIZE for _ in range(NUM_AGENTS)]
     agents_init_guess = [np.random.rand(2) * AREA_SIZE for _ in range(NUM_AGENTS)]
