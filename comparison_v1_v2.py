@@ -139,15 +139,15 @@ def run_one_step_logic(nodes, edges):
 # ==========================================
 def run_visual_comparison():
     # --- 参数 ---
-    AREA_SIZE = 100
+    AREA_SIZE = 200
     NUM_ANCHORS = 4
-    NUM_AGENTS = 20
-    COMM_RANGE = 65
+    NUM_AGENTS = 40
+    COMM_RANGE = 120
     NOISE_STD = 0.5
-    ITERATIONS = 40
+    ITERATIONS = 30
     
     # --- 1. 生成统一数据 (控制变量) ---
-    np.random.seed(12) # 固定种子方便复现 (15,10,12较为典型)
+    np.random.seed(32) # 固定种子方便复现 (15,10,12较为典型,11什么情况)
     anchors_pos = [[0,0], [AREA_SIZE,0], [AREA_SIZE,AREA_SIZE], [0,AREA_SIZE]]
     agents_true_pos = [np.random.rand(2) * AREA_SIZE for _ in range(NUM_AGENTS)]
     agents_init_guess = [np.random.rand(2) * AREA_SIZE for _ in range(NUM_AGENTS)]

@@ -1,3 +1,5 @@
+# Bounded Treewidth Sampling 的实现，来自 Neural Tree 的[62]
+
 import numpy as np
 import heapq
 

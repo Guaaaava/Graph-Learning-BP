@@ -1,3 +1,5 @@
+# 用BTW分解为若干子图，分别跑BP，然后融合，效果很差
+
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.linalg import inv, norm
@@ -288,23 +290,24 @@ def run_bp_on_subgraph(nodes_meta, selected_edges_ids, measurements_map, noise_s
 
 def main_pipeline():
     # --- 参数设置 ---
-    AREA_SIZE = 100
+    AREA_SIZE = 200
     NUM_ANCHORS = 4
-    NUM_AGENTS = 15
-    COMM_RANGE = 70
+    NUM_AGENTS = 40
+    COMM_RANGE = 120
     NOISE_STD = 0.5
     
-    K_SUBGRAPHS = 3  # 分解成几个子图
+    K_SUBGRAPHS = 5  # 分解成几个子图
     TREEWIDTH_K = 3  # 每个子图的树宽限制
     BP_ITERATIONS = 10 # 每个子图跑几轮BP (树宽小，收敛快，10轮足够)
     
     # --- Step 1: 生成上帝视角数据 ---
-    np.random.seed(42)
+    np.random.seed(15)
     anchors_pos = [[0, 0], [AREA_SIZE, 0], [AREA_SIZE, AREA_SIZE], [0, AREA_SIZE]]
     agents_true_pos = [np.random.rand(2) * AREA_SIZE for _ in range(NUM_AGENTS)]
     
     # 统一初始猜测 (让所有子图起点一致)
-    agents_init_guess = [np.random.rand(2) * AREA_SIZE for _ in range(NUM_AGENTS)]
+    # agents_init_guess = [np.random.rand(2) * AREA_SIZE for _ in range(NUM_AGENTS)]
+    agents_init_guess = [_ + np.random.normal(0, 5, size=2) for _ in agents_true_pos]
     
     # 构建节点元数据 (方便后续克隆)
     nodes_meta = []
