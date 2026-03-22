@@ -12,11 +12,20 @@ def build_global_fim_vectorized(agents_pos, anchors_pos, edge_index, edge_weight
     v_idx = edge_index[1] # 另一端的索引
     
     pos_u = agents_pos[u_idx]
-    pos_v = torch.where(
-        is_anchor_edge.unsqueeze(-1), 
-        anchors_pos[v_idx], 
-        agents_pos[v_idx]
-    )
+    
+    # 创建空张量，通过掩码分别赋值，避免数组越界
+    pos_v = torch.zeros_like(pos_u)
+    
+    mask_ak = is_anchor_edge
+    mask_aa = ~is_anchor_edge
+    
+    # 如果有连接 Anchor 的边，取出对应的 Anchor 坐标
+    if mask_ak.any():
+        pos_v[mask_ak] = anchors_pos[v_idx[mask_ak]]
+    
+    # 如果有连接 Agent 的边，取出对应的 Agent 坐标
+    if mask_aa.any():
+        pos_v[mask_aa] = agents_pos[v_idx[mask_aa]]
     
     diff = pos_u - pos_v
     dist = torch.norm(diff, dim=1, keepdim=True) + 1e-8
@@ -37,7 +46,8 @@ def build_global_fim_vectorized(agents_pos, anchors_pos, edge_index, edge_weight
     # 2. 准备一维展平的全局 FIM 容器，大小为 (2N * 2N)
     N2 = 2 * N
     # 初始化微小先验
-    J_global_flat = (torch.eye(N2) * 1e-6).view(-1) 
+    # TODO 1e-6 还是 1e-4？
+    J_global_flat = (torch.eye(N2) * 1e-4).view(-1) 
     
     # 辅助函数：将元素加到一维 FIM 的指定行列上
     def add_to_J(row, col, vals):

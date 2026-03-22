@@ -1,4 +1,7 @@
+# %%
+
 import torch
+import matplotlib.pyplot as plt
 
 def generate_localization_network(num_agents=30, num_anchors=5, area_size=100.0, comm_radius=40.0, base_noise=0.5, noise_scale=0.05):
     """
@@ -68,10 +71,67 @@ def generate_localization_network(num_agents=30, num_anchors=5, area_size=100.0,
 
 # ================= 测试运行 =================
 if __name__ == "__main__":
-    torch.manual_seed(42) # 固定随机种子以复现结果
-    demo_data = generate_localization_network(num_agents=20, num_anchors=4, comm_radius=40.0)
+    torch.manual_seed(1) # 固定随机种子以复现结果
+    # 缩小一点范围或者增加节点以确保能看到丰富的连线
+    demo_data = generate_localization_network(num_agents=20, num_anchors=4, comm_radius=40.0, base_noise=0.5, noise_scale=0.05)
     
     print(f"生成的 Agent 数量: {demo_data['true_agents_pos'].shape[0]}")
     print(f"生成的 Anchor 数量: {demo_data['anchors_pos'].shape[0]}")
     print(f"生成的有效测距边总数: {demo_data['edge_index'].shape[1]}")
     print(f"其中包含 Anchor 的边数: {demo_data['is_anchor_edge'].sum().item()}")
+
+    # ================= 网络可视化 =================
+    # 将 Tensor 转换为 numpy 以便 matplotlib 绘图
+    agents_pos = demo_data['true_agents_pos'].numpy()
+    anchors_pos = demo_data['anchors_pos'].numpy()
+    edge_index = demo_data['edge_index'].numpy()
+    is_anchor_edge = demo_data['is_anchor_edge'].numpy()
+
+    plt.figure(figsize=(10, 8))
+    
+    # 1. 绘制连线 (Edges)
+    for idx in range(edge_index.shape[1]):
+        u, v = edge_index[:, idx]
+        
+        if is_anchor_edge[idx]:
+            # Agent 到 Anchor 的连线 (红色实线)
+            x_coords = [agents_pos[u, 0], anchors_pos[v, 0]]
+            y_coords = [agents_pos[u, 1], anchors_pos[v, 1]]
+            plt.plot(x_coords, y_coords, color='red', linestyle='-', alpha=0.4, linewidth=1.5, zorder=1)
+        else:
+            # Agent 到 Agent 的连线 (灰色虚线)
+            x_coords = [agents_pos[u, 0], agents_pos[v, 0]]
+            y_coords = [agents_pos[u, 1], agents_pos[v, 1]]
+            plt.plot(x_coords, y_coords, color='gray', linestyle='--', alpha=0.4, linewidth=1.0, zorder=1)
+
+    # 2. 绘制节点 (Nodes)
+    # 绘制 Agent 节点 (蓝色圆点)
+    plt.scatter(agents_pos[:, 0], agents_pos[:, 1], c='blue', marker='o', s=80, label='Agent (True Pos)', zorder=2)
+    for i in range(agents_pos.shape[0]):
+        plt.text(agents_pos[i, 0] + 1, agents_pos[i, 1] + 1, str(i), fontsize=9, color='darkblue')
+
+    # 绘制 Anchor 节点 (红色三角)
+    plt.scatter(anchors_pos[:, 0], anchors_pos[:, 1], c='red', marker='^', s=150, label='Anchor', zorder=2)
+    for i in range(anchors_pos.shape[0]):
+        plt.text(anchors_pos[i, 0] + 1.5, anchors_pos[i, 1] + 1.5, f"A{i}", fontsize=11, fontweight='bold', color='darkred')
+
+    # 3. 设置图表属性
+    plt.title('Cooperative Localization Virtual Network', fontsize=16)
+    plt.xlabel('X Coordinate (m)', fontsize=12)
+    plt.ylabel('Y Coordinate (m)', fontsize=12)
+    
+    # 自定义图例，避免重复绘制线条
+    from matplotlib.lines import Line2D
+    custom_lines = [
+        Line2D([0], [0], color='blue', marker='o', linestyle='None', markersize=8),
+        Line2D([0], [0], color='red', marker='^', linestyle='None', markersize=10),
+        Line2D([0], [0], color='gray', linestyle='--', lw=1.5),
+        Line2D([0], [0], color='red', linestyle='-', lw=1.5)
+    ]
+    plt.legend(custom_lines, ['Agent', 'Anchor', 'Agent-Agent Edge', 'Agent-Anchor Edge'], loc='upper right')
+
+    plt.grid(True, linestyle=':', alpha=0.6)
+    plt.axis('equal')  # 保证X轴和Y轴的比例一致，这样通信半径才会看起来是个正圆
+    plt.tight_layout()
+    plt.show()
+# %%
