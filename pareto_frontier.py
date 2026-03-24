@@ -4,26 +4,29 @@ import torch
 import matplotlib.pyplot as plt
 import numpy as np
 
-# 假设你的训练函数保存在 train.py 中，请根据实际文件名导入
-from train import train_gnn_sparsifier
+from GNN_learning.train import train_gnn_sparsifier
+
+TORCH_SEED = 1
+EPOCHS = 1000
 
 def search_best_lambda():
-    # 1. 定义我们要探索的 lambda 候选列表
-    # 从“几乎不剪 (0.01)” 到 “疯狂乱剪 (0.4)”
-    lambda_candidates = [0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5]
+    # 1. 定义要探索的 lambda 候选列表
+    lambda_candidates = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5]
+    # lambda_candidates = [0.28, 0.29, 0.31, 0.32]
     
     results_edges = []
     results_crlb_ratio = []
     
     print("==================================================")
-    print("开始执行 Lambda 网格搜索与帕累托前沿分析")
+    print("开始执行 Lambda 搜索")
     print("==================================================")
     
     # 2. 遍历每一个 lambda 进行完整训练
     for lam in lambda_candidates:
         print(f"\n>>> 正在测试 lambda_reg = {lam} ...")
+        torch.manual_seed(TORCH_SEED)
         _, _, data, final_edges, crlb_final, crlb_full = train_gnn_sparsifier(
-            epochs=300, lr=0.01, lambda_reg=lam
+            epochs=EPOCHS, lr=0.01, lambda_reg=lam
         )
         
         crlb_ratio = crlb_final / crlb_full
@@ -32,12 +35,12 @@ def search_best_lambda():
         
         print(f"[测试完成] Lambda: {lam} | 保留边数: {final_edges} | CRLB 倍数: {crlb_ratio:.2f}")
 
-    # 3. 绘制帕累托前沿曲线 (Pareto Frontier)
-    print("\n>>> 所有测试完成，正在绘制帕累托前沿曲线...")
+    # 3. 绘制曲线
+    print("\n>>> 所有测试完成，正在绘制曲线...")
     plt.figure(figsize=(10, 6))
     
     # 画出散点和连线
-    plt.plot(results_edges, results_crlb_ratio, marker='o', linestyle='-', color='#4A90E2', linewidth=2, markersize=8)
+    plt.plot(results_edges, results_crlb_ratio, marker='o', linestyle='', color='#4A90E2', linewidth=2, markersize=8)
     
     # 标注每个点对应的 lambda 值
     for i, lam in enumerate(lambda_candidates):
@@ -59,11 +62,32 @@ def search_best_lambda():
     plt.ylabel('CRLB Degradation Ratio (Current / Baseline)', fontsize=12)
     plt.grid(True, linestyle='--', alpha=0.7)
     
-    # 反转 X 轴（通常稀疏度越小，边数越少，我们希望图向右看是精度变高，向左看是边数变少）
-    plt.gca().invert_xaxis()
-    
     plt.tight_layout()
     plt.show()
 
+    # 4. 输出结果汇总表
+    print("\n===========================================================")
+    print("搜索结果汇总表")
+    print("===========================================================")
+    # 打印表头，确保对齐
+    print(f"{'Lambda (λ)':<12} | {'保留边数 / 总边数':<18} | {'CRLB 倍率':<12}")
+    print("-" * 59)
+    
+    # 遍历输出每一行数据
+    for i, lam in enumerate(lambda_candidates):
+        edge_str = f"{results_edges[i]} / {E_total}"
+        crlb_str = f"{results_crlb_ratio[i]:.4f}"
+        print(f"{lam:<12} | {edge_str:<21} | {crlb_str:<12}")
+    print("===========================================================")
+
 if __name__ == "__main__":
     search_best_lambda()
+
+# seed | lambda_reg
+#  1   |   0.25
+#  2   |   0.04
+#  3   |   0.25
+#  4   |   0.1
+#  5   |   1.1
+#  6   |   0.3
+# %%

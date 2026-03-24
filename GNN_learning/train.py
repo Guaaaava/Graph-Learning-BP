@@ -6,14 +6,9 @@ from GNN_learning.generate_network import generate_localization_network
 from GNN_learning.build_global_FIM import build_global_fim_vectorized
 from GNN_learning.edge_predictor_GNN import EdgePredictorGNN
 
-# from generate_network import generate_localization_network
-# from build_global_FIM import build_global_fim_vectorized
-# from edge_predictor_GNN import EdgePredictorGNN
-
-def train_gnn_sparsifier(epochs=300, lr=0.01, lambda_reg=1.0):
+def train_gnn_sparsifier(epochs=1000, lr=0.01, lambda_reg=1.0):
     # 1. 初始化物理场景与数据
     print(">>> [1/3] 初始化协同定位物理场景...")
-    torch.manual_seed(1) # 固定种子方便复现
     data = generate_localization_network(
         num_agents=20, num_anchors=4, area_size=100.0, 
         comm_radius=40.0, base_noise=0.5, noise_scale=0.05
@@ -34,7 +29,6 @@ def train_gnn_sparsifier(epochs=300, lr=0.01, lambda_reg=1.0):
         J_full = build_global_fim_vectorized(
             agents_pos, anchors_pos, edge_index, torch.ones(E), edge_variances, is_anchor_edge
         )
-        # 稳定求特征值
         eigenvalues_full = torch.linalg.eigvalsh(J_full)
         crlb_full = torch.sum(1.0 / torch.clamp(eigenvalues_full, min=1e-6))
         log_crlb_full = math.log(crlb_full.item())
@@ -46,13 +40,14 @@ def train_gnn_sparsifier(epochs=300, lr=0.01, lambda_reg=1.0):
     print("\n>>> [3/3] 开始 GNN 剪枝训练...")
     model = EdgePredictorGNN(node_in_dim=3, edge_in_dim=2, hidden_dim=32)
     optimizer = optim.Adam(model.parameters(), lr=lr)
+
     # 学习率衰减：每 50 轮将学习率乘以 0.5
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
     
     # Gumbel-Softmax 温度退火设置
     tau_init = 1.0
     tau_min = 0.1
-    tau_decay = 0.99 # 每个 epoch 衰减率
+    tau_decay = 0.997126 # 每个 epoch 衰减率
     tau = tau_init
     
     # 3. 主训练循环
@@ -61,14 +56,12 @@ def train_gnn_sparsifier(epochs=300, lr=0.01, lambda_reg=1.0):
         optimizer.zero_grad()
         
         # --- A. 前向传播：预测边权重 ---
-        # 传入 tau 控制 Gumbel 采样的“硬度”
         edge_weights, logits = model(
             agents_pos, anchors_pos, edge_index, 
             measurements, edge_variances, is_anchor_edge, tau=tau
         )
         
         # --- B. 组装 FIM 并计算理论误差 ---
-        # 此时 edge_weights 包含由 0 和 1 组成的离散张量，且带着连续的梯度！
         J_global = build_global_fim_vectorized(
             agents_pos, anchors_pos, edge_index, edge_weights, edge_variances, is_anchor_edge
         )
@@ -78,12 +71,10 @@ def train_gnn_sparsifier(epochs=300, lr=0.01, lambda_reg=1.0):
         valid_eigenvalues = torch.clamp(eigenvalues, min=1e-6)
         crlb_raw = torch.sum(1.0 / valid_eigenvalues)
 
-        # 相对精度恶化率 (Normalized CRLB Penalty)，用当前 CRLB 取对数减去基准全图的 CRLB 对数
-        # 物理意义：网络刚开始时，这个值为 0。如果误差增加 10%，这个值大约就是 0.1。
-        # 让不同的图被拉到同一个相对起跑线上
+        # 相对精度恶化率 (当前 CRLB 取对数减去基准全图的 CRLB 对数)
         crlb_penalty = torch.log(crlb_raw) - log_crlb_full
         
-        # 绝对稀疏惩罚：如果 lambda_reg = 0.05，只要剪掉一条边导致的 CRLB 提升不到 5%，就可以剪掉
+        # 稀疏惩罚
         sparsity_loss = lambda_reg * torch.sum(edge_weights)
         
         # --- C. 计算总损失 (CRLB + 稀疏惩罚) ---
@@ -118,7 +109,7 @@ def train_gnn_sparsifier(epochs=300, lr=0.01, lambda_reg=1.0):
             agents_pos, anchors_pos, edge_index, 
             measurements, edge_variances, is_anchor_edge, tau=tau_min
         )
-        # 剥离噪声，严格根据网络学到的 Logits 输出 0 或 1
+        # 剥离噪声，根据网络学到的 Logits 输出 0 或 1
         final_weights = (logits > 0).float()
         final_edges = int(torch.sum(final_weights).item())
         
@@ -132,10 +123,4 @@ def train_gnn_sparsifier(epochs=300, lr=0.01, lambda_reg=1.0):
 
     return model, final_weights, data, final_edges, crlb_final.item(), crlb_full.item()
 
-# 运行训练
-if __name__ == "__main__":
-    trained_model, sparse_topology, data, _, _, _ = train_gnn_sparsifier(epochs=300, lr=0.01, lambda_reg=1)
-
-    # 0.5 开始剪枝，34/107
-
-    # 保留边数为什么会 12-77-60-65-73-74-... 这样浮动呢？--> Gumbel 噪声带来的探索
+# 保留边数为什么会 12-77-60-65-73-74-... 这样浮动呢？--> Gumbel 噪声带来的探索

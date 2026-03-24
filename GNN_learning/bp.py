@@ -1,8 +1,9 @@
 import torch
 
-def gaussian_bp_localization(agents_pos_init, anchors_pos, edge_index, measurements, edge_variances, is_anchor_edge, edge_weights=None, num_iters=15):
+def gaussian_bp_localization(agents_pos_init, anchors_pos, edge_index, measurements, edge_variances, is_anchor_edge, edge_weights=None, num_iters=20, tol=1e-4):
     """
     标准线性化高斯置信传播 (Linearized Gaussian BP) 算法
+    返回：mu (均值), Sigma (协方差), actual_iters (实际收敛迭代次数)
     """
     N = agents_pos_init.shape[0]
     E = edge_index.shape[1]
@@ -20,8 +21,12 @@ def gaussian_bp_localization(agents_pos_init, anchors_pos, edge_index, measureme
     J_prior = torch.eye(2) * 1e-4
     h_prior = torch.zeros(2)
 
+    actual_iters = num_iters # 默认跑满
+
     # --- 2. 迭代消息传递 ---
     for it in range(num_iters):
+        mu_old = mu.clone() # 记录上一轮的位置，用于收敛判断
+
         J_new = J_prior.unsqueeze(0).repeat(N, 1, 1)
         h_new = h_prior.unsqueeze(0).repeat(N, 1)
         
@@ -90,5 +95,11 @@ def gaussian_bp_localization(agents_pos_init, anchors_pos, edge_index, measureme
                 mu[i] = torch.mv(Sigma[i], h_new[i])
             except RuntimeError:
                 pass # 忽略孤立节点的奇异矩阵，保持原位
-                
-    return mu, Sigma
+
+        # 收敛检查机制
+        max_pos_change = torch.max(torch.norm(mu - mu_old, dim=1))
+        if max_pos_change < tol:
+            actual_iters = it + 1 # 记录在第几轮收敛的
+            break # 提前结束迭代
+
+    return mu, Sigma, actual_iters

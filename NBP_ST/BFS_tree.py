@@ -12,7 +12,6 @@ def extract_bfs_tree_edges(num_agents, num_anchors, edge_index):
     
     # 将边加入 networkx 图中
     edges = edge_index.T.numpy()
-    # 注意：如果节点是 Anchor，我们在可视化时将其索引加上 num_agents
     for u, v in edges:
         G.add_edge(u, v)
         

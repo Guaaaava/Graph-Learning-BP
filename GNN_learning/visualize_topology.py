@@ -71,39 +71,9 @@ def plot_topology_comparison(data, gnn_weights, bfs_weights):
     dense_weights = torch.ones(edge_index.shape[1])
     
     # 绘制三联图
-    draw_single_graph(axes[0], "1. Original Dense Graph\n(Severe Overconfidence)", dense_weights)
-    draw_single_graph(axes[1], "2. BFS Spanning Tree\n(Blind Loop-Breaking)", bfs_weights)
-    draw_single_graph(axes[2], "3. GNN Pruned Graph\n(FIM/CRLB Guided)", gnn_weights)
+    draw_single_graph(axes[0], "1. Original Dense Graph", dense_weights)
+    draw_single_graph(axes[1], "2. BFS Spanning Tree", bfs_weights)
+    draw_single_graph(axes[2], "3. GNN Pruned Graph", gnn_weights)
     
     plt.tight_layout()
     plt.show()
-
-# ================= 测试运行 =================
-# if __name__ == "__main__":
-#     # 把父目录临时加入到系统的环境变量中
-#     import sys
-#     import os
-
-#     current_dir = os.path.dirname(os.path.abspath(__file__))
-#     parent_dir = os.path.dirname(current_dir)
-#     sys.path.append(parent_dir)
-
-#     # 导入我们之前写的数据生成器
-#     from generate_network import generate_localization_network
-#     from NBP_ST.BFS_tree import extract_bfs_tree_edges
-    
-#     torch.manual_seed(1)
-#     print(">>> 正在生成网络场景数据...")
-#     data = generate_localization_network(num_agents=25, num_anchors=4, comm_radius=40.0)
-#     E = data['edge_index'].shape[1]
-    
-#     print(">>> 正在提取 BFS 基准生成树...")
-#     bfs_weights = extract_bfs_tree_edges(25, 4, data['edge_index'])
-    
-#     print(">>> 模拟 GNN 输出 (为了测试画图脚本，我们这里随机保留一部分边)")
-#     # [注意]：在这里，你应该传入你刚才 train.py 训练出来的 final_weights
-#     # 这里用随机二项分布模拟一个稀疏输出，以便你可以立刻跑通测试画图效果
-#     dummy_gnn_weights = torch.bernoulli(torch.ones(E) * 0.4) 
-    
-#     print(">>> 正在绘制对比图...")
-#     plot_topology_comparison(data, dummy_gnn_weights, bfs_weights)

@@ -3,7 +3,7 @@
 import torch
 import matplotlib.pyplot as plt
 
-def generate_localization_network(num_agents=30, num_anchors=5, area_size=100.0, comm_radius=40.0, base_noise=0.5, noise_scale=0.05):
+def generate_localization_network(num_agents=20, num_anchors=4, area_size=100.0, comm_radius=40.0, base_noise=0.5, noise_scale=0.05):
     """
     生成协同定位虚拟网络数据
     新增：衰减系数 noise_scale，按照实际情况，距离越远标准差越大
@@ -73,7 +73,7 @@ def generate_localization_network(num_agents=30, num_anchors=5, area_size=100.0,
 if __name__ == "__main__":
     torch.manual_seed(1) # 固定随机种子以复现结果
     # 缩小一点范围或者增加节点以确保能看到丰富的连线
-    demo_data = generate_localization_network(num_agents=20, num_anchors=4, comm_radius=40.0, base_noise=0.5, noise_scale=0.05)
+    demo_data = generate_localization_network(num_agents=20, num_anchors=4, area_size=100.0,comm_radius=40.0, base_noise=0.5, noise_scale=0.05)
     
     print(f"生成的 Agent 数量: {demo_data['true_agents_pos'].shape[0]}")
     print(f"生成的 Anchor 数量: {demo_data['anchors_pos'].shape[0]}")
