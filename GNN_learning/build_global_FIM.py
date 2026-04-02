@@ -46,7 +46,6 @@ def build_global_fim_vectorized(agents_pos, anchors_pos, edge_index, edge_weight
     # 2. 准备一维展平的全局 FIM 容器，大小为 (2N * 2N)
     N2 = 2 * N
     # 初始化微小先验
-    # TODO 1e-6 还是 1e-4？
     J_global_flat = (torch.eye(N2) * 1e-4).view(-1) 
     
     # 辅助函数：将元素加到一维 FIM 的指定行列上

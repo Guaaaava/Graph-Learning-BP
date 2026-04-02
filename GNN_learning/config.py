@@ -1,0 +1,19 @@
+# 全局种子
+TORCH_SEED = 1
+
+# 定位网络拓扑参数
+NUM_AGENTS = 30
+NUM_ANCHORS = 4
+AREA_SIZE = 100.0
+COMM_RADIUS= 30.0
+BASE_NOISE= 0.5
+NOISE_SCALE= 0.05
+SCENARIO_TYPE= 'challenge'
+
+# 训练参数
+LAMBDA_REG = [0, 0.19, 0.11, 0.05, 0.6, 0.4, 0.7, 0.12]
+EPOCHS = 1000
+
+# BP 参数
+NUM_ITERS = 25
+TOLERANCE = 1e-1

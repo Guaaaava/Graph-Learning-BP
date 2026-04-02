@@ -64,6 +64,4 @@
 
 1. 为了后续能将成千上万张不同规模的图打包成 Batch 进行训练，需要将目前的 `generate_localization_network` 输出格式，改造为符合 `PyG Data` 对象的标准格式，并尝试使用 `DataLoader` 加载 10 个图构成一个 `Mini-batch`，测试一下批量矩阵拼接是否正常。
 
-2. seed, decay_rate 等参数全局设置。seed 在每次训练都要设置一下
-
-3. 为什么原图 BP 收敛次数反而是最少的？效率指标怎么定义？
+2. 

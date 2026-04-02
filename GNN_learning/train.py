@@ -2,6 +2,7 @@ import torch
 import torch.optim as optim
 import math
 
+import GNN_learning.config as config
 from GNN_learning.generate_network import generate_localization_network
 from GNN_learning.build_global_FIM import build_global_fim_vectorized
 from GNN_learning.edge_predictor_GNN import EdgePredictorGNN
@@ -10,8 +11,8 @@ def train_gnn_sparsifier(epochs=1000, lr=0.01, lambda_reg=1.0):
     # 1. 初始化物理场景与数据
     print(">>> [1/3] 初始化协同定位物理场景...")
     data = generate_localization_network(
-        num_agents=20, num_anchors=4, area_size=100.0, 
-        comm_radius=40.0, base_noise=0.5, noise_scale=0.05
+        num_agents=config.NUM_AGENTS, num_anchors=config.NUM_ANCHORS, area_size=config.AREA_SIZE, 
+        comm_radius=config.COMM_RADIUS, base_noise=config.BASE_NOISE, noise_scale=config.NOISE_SCALE, scenario_type=config.SCENARIO_TYPE
     )
     
     # 提取网络信息
@@ -118,8 +119,6 @@ def train_gnn_sparsifier(epochs=1000, lr=0.01, lambda_reg=1.0):
         crlb_final = torch.sum(1.0 / torch.clamp(torch.linalg.eigvalsh(J_final), min=1e-6))
         print(f"最终成果：网络从 {E} 条边精简至 {final_edges} 条边！")
         print(f"最终干净图 CRLB: {crlb_final.item():.4f} (是基准的 {crlb_final.item()/crlb_full.item():.2f} 倍)")
-        
-    # return model, final_weights, data
 
     return model, final_weights, data, final_edges, crlb_final.item(), crlb_full.item()
 

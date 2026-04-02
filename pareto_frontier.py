@@ -4,15 +4,13 @@ import torch
 import matplotlib.pyplot as plt
 import numpy as np
 
+import GNN_learning.config as config
 from GNN_learning.train import train_gnn_sparsifier
-
-TORCH_SEED = 1
-EPOCHS = 1000
 
 def search_best_lambda():
     # 1. 定义要探索的 lambda 候选列表
-    lambda_candidates = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5]
-    # lambda_candidates = [0.28, 0.29, 0.31, 0.32]
+    # lambda_candidates = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+    lambda_candidates = [0.07, 0.09, 0.11, 0.12, 0.13]
     
     results_edges = []
     results_crlb_ratio = []
@@ -24,9 +22,9 @@ def search_best_lambda():
     # 2. 遍历每一个 lambda 进行完整训练
     for lam in lambda_candidates:
         print(f"\n>>> 正在测试 lambda_reg = {lam} ...")
-        torch.manual_seed(TORCH_SEED)
+        torch.manual_seed(config.TORCH_SEED)
         _, _, data, final_edges, crlb_final, crlb_full = train_gnn_sparsifier(
-            epochs=EPOCHS, lr=0.01, lambda_reg=lam
+            epochs=config.EPOCHS, lr=0.01, lambda_reg=lam
         )
         
         crlb_ratio = crlb_final / crlb_full
@@ -83,11 +81,11 @@ def search_best_lambda():
 if __name__ == "__main__":
     search_best_lambda()
 
-# seed | lambda_reg
-#  1   |   0.25
-#  2   |   0.04
-#  3   |   0.25
-#  4   |   0.1
-#  5   |   1.1
-#  6   |   0.3
+# seed | lambda_reg | challege
+#  1   |    0.25    |   0.19
+#  2   |    0.04    |   0.11
+#  3   |    0.25    |   0.05
+#  4   |    0.1     |   0.6
+#  5   |    1.1     |   0.4
+#  6   |    0.3     |   0.7
 # %%
