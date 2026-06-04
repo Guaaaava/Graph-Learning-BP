@@ -1,5 +1,5 @@
 # 全局种子
-TORCH_SEED = 1
+TORCH_SEED = 100
 
 # 定位网络拓扑参数
 NUM_AGENTS = 30
@@ -13,6 +13,10 @@ SCENARIO_TYPE= 'challenge'
 # 训练参数
 LAMBDA_REG = [0, 0.19, 0.11, 0.05, 0.6, 0.4, 0.7, 0.12]
 EPOCHS = 1000
+BATCH_SIZE = 32
+LAMBDA_REG_BATCH = 15.0
+LR = 0.005
+EPOCHS_BATCH = 100
 
 # BP 参数
 NUM_ITERS = 25
