@@ -1,125 +1,181 @@
+"""
+GNN 图拓扑优化训练
+
+使用 GIB 损失训练 EdgePredictorGNN:
+  - 前向: GNN → logits → Gumbel-Sigmoid STE → hard mask z^{out}
+  - 损失: logdet(FIM^{-1}) + λ·KL(p||q) + η·Σ ReLU(3-D_i)
+  - 退火: τ 从高到低衰减, 逐步从探索转向确定
+"""
+
 import torch
-import torch.optim as optim
-import math
+from torch.optim import AdamW
+from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch_geometric.loader import DataLoader
+import numpy as np
+import os
 
-import GNN_learning.config as config
-from GNN_learning.generate_network import generate_localization_network
-from GNN_learning.build_global_FIM import build_global_fim_vectorized
-from GNN_learning.edge_predictor_GNN import EdgePredictorGNN
+from dataset import LocalizationDataset
+from model import EdgePredictorGNN
+from loss import compute_gib_loss
+import config
 
-def train_gnn_sparsifier(epochs=1000, lr=0.01, lambda_reg=1.0):
-    # 1. 初始化物理场景与数据
-    print(">>> [1/3] 初始化协同定位物理场景...")
-    data = generate_localization_network(
-        num_agents=config.NUM_AGENTS, num_anchors=config.NUM_ANCHORS, area_size=config.AREA_SIZE, 
-        comm_radius=config.COMM_RADIUS, base_noise=config.BASE_NOISE, noise_scale=config.NOISE_SCALE, scenario_type=config.SCENARIO_TYPE
-    )
-    
-    # 提取网络信息
-    agents_pos = data['true_agents_pos']
-    anchors_pos = data['anchors_pos']
-    edge_index = data['edge_index']
-    measurements = data['measurements']
-    edge_variances = data['edge_variances']
-    is_anchor_edge = data['is_anchor_edge']
-    E = edge_index.shape[1]
-    
-    # 计算全图基准 CRLB (所有边权重设为 1.0)
-    print(">>> [2/3] 计算稠密全图基准 CRLB...")
-    with torch.no_grad():
-        J_full = build_global_fim_vectorized(
-            agents_pos, anchors_pos, edge_index, torch.ones(E), edge_variances, is_anchor_edge
-        )
-        eigenvalues_full = torch.linalg.eigvalsh(J_full)
-        crlb_full = torch.sum(1.0 / torch.clamp(eigenvalues_full, min=1e-6))
-        log_crlb_full = math.log(crlb_full.item())
-    
-    print(f"    原始稠密图边数: {E}")
-    print(f"    原始稠密图 CRLB: {crlb_full.item():.4f}")
-    
-    # 2. 初始化 GNN 模型与优化器
-    print("\n>>> [3/3] 开始 GNN 剪枝训练...")
-    model = EdgePredictorGNN(node_in_dim=3, edge_in_dim=2, hidden_dim=32)
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-    # 学习率衰减：每 50 轮将学习率乘以 0.5
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
-    
-    # Gumbel-Softmax 温度退火设置
-    tau_init = 1.0
-    tau_min = 0.1
-    tau_decay = 0.997126 # 每个 epoch 衰减率
-    tau = tau_init
-    
-    # 3. 主训练循环
-    for epoch in range(epochs):
+
+def train_gnn(sparsity_weight=None, lambda_reg=None, eta=None, epochs=None,
+              lr=None, tau_init=None, tau_decay=None):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"设备: {device}")
+
+    # 允许 CLI 覆盖 config 默认值
+    _sp_w = sparsity_weight if sparsity_weight is not None else config.SPARSITY_WEIGHT
+    _lam   = lambda_reg if lambda_reg is not None else config.LAMBDA_REG
+    _eta   = eta if eta is not None else config.ETA
+    _epochs = epochs if epochs is not None else config.EPOCHS
+    _lr    = lr if lr is not None else config.LR
+    _tau_init = tau_init if tau_init is not None else config.TAU_INIT
+    _tau_decay = tau_decay if tau_decay is not None else config.TAU_DECAY
+
+    # ==========================================
+    # 1. 加载数据
+    # ==========================================
+    train_path = os.path.join(SCRIPT_DIR, "datasets/train_dataset.pt")
+    val_path = os.path.join(SCRIPT_DIR, "datasets/val_dataset.pt")
+    train_dataset = LocalizationDataset(train_path)
+    val_dataset = LocalizationDataset(val_path)
+
+    train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE,
+                               shuffle=True, num_workers=0)
+    val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE,
+                             shuffle=False, num_workers=0)
+
+    # ==========================================
+    # 2. 模型 & 优化器
+    # ==========================================
+    model = EdgePredictorGNN(
+        node_in_dim=config.NODE_IN_DIM,
+        edge_in_dim=config.EDGE_IN_DIM,
+        hidden_dim=config.HIDDEN_DIM,
+        num_layers=config.NUM_LAYERS,
+    ).to(device)
+
+    optimizer = AdamW(model.parameters(), lr=_lr, weight_decay=1e-4)
+    scheduler = CosineAnnealingLR(optimizer, T_max=_epochs, eta_min=1e-5)
+
+    models_dir = os.path.join(SCRIPT_DIR, "models")
+    os.makedirs(models_dir, exist_ok=True)
+    best_val_loss = float('inf')
+
+    print("=" * 60)
+    print(f"开始训练 · Epochs={_epochs} · Batch={config.BATCH_SIZE}")
+    print(f"GIB: λ={_lam}, γ={config.GAMMA}, η={_eta}, sp_w={_sp_w}")
+    print("=" * 60)
+
+    for epoch in range(1, _epochs + 1):
+        # 温度退火
+        tau = max(config.TAU_MIN, _tau_init * (_tau_decay ** epoch))
+
+        # ================ 训练 ================
         model.train()
-        optimizer.zero_grad()
-        
-        # --- A. 前向传播：预测边权重 ---
-        edge_weights, logits = model(
-            agents_pos, anchors_pos, edge_index, 
-            measurements, edge_variances, is_anchor_edge, tau=tau
-        )
-        
-        # --- B. 组装 FIM 并计算理论误差 ---
-        J_global = build_global_fim_vectorized(
-            agents_pos, anchors_pos, edge_index, edge_weights, edge_variances, is_anchor_edge
-        )
-        
-        # 计算特征值与 CRLB
-        eigenvalues = torch.linalg.eigvalsh(J_global)
-        valid_eigenvalues = torch.clamp(eigenvalues, min=1e-6)
-        crlb_raw = torch.sum(1.0 / valid_eigenvalues)
+        train_loss, train_fim, train_kl, train_deg = 0, 0, 0, 0
+        train_edges = 0
 
-        # 相对精度恶化率 (当前 CRLB 取对数减去基准全图的 CRLB 对数)
-        crlb_penalty = torch.log(crlb_raw) - log_crlb_full
-        
-        # 稀疏惩罚
-        sparsity_loss = lambda_reg * torch.sum(edge_weights)
-        
-        # --- C. 计算总损失 (CRLB + 稀疏惩罚) ---
-        # L1 稀疏正则化：鼓励 edge_weights 尽可能多地变成 0
-        total_loss = crlb_penalty + sparsity_loss
-        
-        # --- D. 反向传播与优化 ---
-        total_loss.backward()
-        
-        # 梯度裁剪 (防止 CRLB 倒数爆炸导致梯度失控)
-        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=2.0)
-        
-        optimizer.step()
+        for batch in train_loader:
+            batch = batch.to(device)
+            optimizer.zero_grad()
+
+            edge_weights, logits = model(batch, tau=tau, hard=True)
+            loss, d = compute_gib_loss(
+                logits, edge_weights, batch,
+                gamma=config.GAMMA,
+                lambda_reg=_lam,
+                eta=_eta,
+                prior_weight=config.FIM_PRIOR,
+                sparsity_weight=_sp_w,
+            )
+
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)
+            optimizer.step()
+
+            train_loss += d['total']
+            train_fim += d['fim']
+            train_kl += d['kl']
+            train_deg += d['degree']
+            train_edges += d['active_edges']
+
+        n_batch = len(train_loader)
+        train_loss /= n_batch
+        train_fim /= n_batch
+        train_kl /= n_batch
+        train_deg /= n_batch
+        train_edges /= n_batch
+
         scheduler.step()
-        
-        # --- E. 温度退火 (Annealing) ---
-        tau = max(tau_min, tau * tau_decay)
 
-        # --- F. 日志打印 ---
-        if epoch % 20 == 0 or epoch == epochs - 1:
-            active_edges = int(torch.sum(edge_weights).item())
-            retention_rate = crlb_raw.item() / crlb_full.item()
-            print(f"Epoch {epoch:03d} | Total Loss: {total_loss.item():.4f} "
-                  f"| CRLB: {crlb_raw.item():.4f} (是基准的 {retention_rate:.2f} 倍) "
-                  f"| 保留边数: {active_edges}/{E} | Tau: {tau:.3f}")
+        # ================ 验证 ================
+        model.eval()
+        val_loss = 0
 
-    # 4. 训练结束，输出最终稀疏图拓扑
-    print("\n>>> 训练完成！")
-    model.eval()
-    with torch.no_grad():
-        _, logits = model(
-            agents_pos, anchors_pos, edge_index, 
-            measurements, edge_variances, is_anchor_edge, tau=tau_min
-        )
-        # 剥离噪声，根据网络学到的 Logits 输出 0 或 1
-        final_weights = (logits > 0).float()
-        final_edges = int(torch.sum(final_weights).item())
-        
-        # 最终干净图的真实 CRLB
-        J_final = build_global_fim_vectorized(agents_pos, anchors_pos, edge_index, final_weights, edge_variances, is_anchor_edge)
-        crlb_final = torch.sum(1.0 / torch.clamp(torch.linalg.eigvalsh(J_final), min=1e-6))
-        print(f"最终成果：网络从 {E} 条边精简至 {final_edges} 条边！")
-        print(f"最终干净图 CRLB: {crlb_final.item():.4f} (是基准的 {crlb_final.item()/crlb_full.item():.2f} 倍)")
+        with torch.no_grad():
+            for batch in val_loader:
+                batch = batch.to(device)
+                edge_weights, logits = model(batch, tau=0.1, hard=True)
+                loss, _ = compute_gib_loss(
+                    logits, edge_weights, batch,
+                    gamma=config.GAMMA,
+                    lambda_reg=_lam,
+                    eta=_eta,
+                    prior_weight=config.FIM_PRIOR,
+                    sparsity_weight=_sp_w,
+                )
+                val_loss += loss.item()
 
-    return model, final_weights, data, final_edges, crlb_final.item(), crlb_full.item()
+        val_loss /= len(val_loader)
 
-# 保留边数为什么会 12-77-60-65-73-74-... 这样浮动呢？--> Gumbel 噪声带来的探索
+        # 保存最佳模型
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            torch.save(model.state_dict(), os.path.join(models_dir, "best_model.pth"))
+
+        # 日志
+        if epoch % 10 == 0 or epoch == 1:
+            print(
+                f"Epoch {epoch:3d} | τ={tau:.2f} | "
+                f"Train: {train_loss:.2f} (FIM:{train_fim:.1f} KL:{train_kl:.3f} Deg:{train_deg:.3f}) "
+                f"Edges:{train_edges:.0f} | Val: {val_loss:.2f}"
+            )
+
+    # 保存最终模型
+    torch.save(model.state_dict(), os.path.join(models_dir, "final_model.pth"))
+    print(f"\n训练完成！最佳验证损失: {best_val_loss:.2f}")
+    print(f"模型已保存至 {models_dir}/")
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="GNN 图拓扑优化训练")
+    parser.add_argument('--sparsity-weight', type=float, default=None,
+                        help=f'稀疏惩罚权重 (默认: {config.SPARSITY_WEIGHT})')
+    parser.add_argument('--lambda-reg', type=float, default=None,
+                        help=f'KL 正则化权重 (默认: {config.LAMBDA_REG})')
+    parser.add_argument('--eta', type=float, default=None,
+                        help=f'度数约束权重 (默认: {config.ETA})')
+    parser.add_argument('--epochs', type=int, default=None,
+                        help=f'训练轮数 (默认: {config.EPOCHS})')
+    parser.add_argument('--lr', type=float, default=None,
+                        help=f'学习率 (默认: {config.LR})')
+    parser.add_argument('--tau-init', type=float, default=None,
+                        help=f'初始温度 (默认: {config.TAU_INIT})')
+    parser.add_argument('--tau-decay', type=float, default=None,
+                        help=f'温度衰减率 (默认: {config.TAU_DECAY})')
+    args = parser.parse_args()
+    train_gnn(
+        sparsity_weight=args.sparsity_weight,
+        lambda_reg=args.lambda_reg,
+        eta=args.eta,
+        epochs=args.epochs,
+        lr=args.lr,
+        tau_init=args.tau_init,
+        tau_decay=args.tau_decay,
+    )
