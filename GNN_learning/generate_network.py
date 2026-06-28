@@ -1,8 +1,10 @@
 """
 协同定位网络图生成器
 
-生成包含 Agent 与 Anchor 的测距图，支持:
-  - challenge 模式: 集群化 Agent + 角落 Anchor + NLOS 陷阱边
+生成包含 Agent 与 Anchor 的测距图，支持三种递进场景:
+  - normal:    锚点均匀分布 + Agent均匀分布 + 无NLOS (基准)
+  - hard:      锚点固定(四角+中心) + Agent均匀分布 + 无NLOS
+  - challenge: 锚点仅四角 + Agent中心聚集 + NLOS陷阱边
   - 初始位置不确定度
   - 伪距残差 (pseudo-range residual)
 """
@@ -38,7 +40,9 @@ def generate_localization_network(num_agents=30, num_anchors=4,
     init_pos_cov : float
         初始位置估计的方差 (m²), 用于生成含噪初值
     scenario_type : str
-        'challenge' — 挑战模式 / 'uniform' — 均匀分布
+        'normal' — 锚点均匀分布, Agent均匀分布, 无NLOS (基准)
+        'hard' — 锚点固定(四角+中心), Agent均匀分布, 无NLOS
+        'challenge' — 锚点仅四角, Agent中心聚集, 含NLOS陷阱边
 
     Returns
     -------
@@ -51,28 +55,47 @@ def generate_localization_network(num_agents=30, num_anchors=4,
     # ============================================
     # 1. 位置采样
     # ============================================
-    if scenario_type == 'challenge':
-        anchors_pos = torch.tensor([
-            [0.0, 0.0],
-            [area_size, 0.0],
-            [0.0, area_size],
-            [area_size, area_size]
-        ], dtype=torch.float32)
-        if num_anchors < 4:
-            anchors_pos = anchors_pos[:num_anchors]
-        elif num_anchors > 4:
+    corner_anchors = torch.tensor([
+        [0.0, 0.0],
+        [area_size, 0.0],
+        [0.0, area_size],
+        [area_size, area_size]
+    ], dtype=torch.float32)
+
+    if scenario_type == 'normal':
+        # 正常场景: 锚点均匀分布, Agent均匀分布, 统一通信半径, 无NLOS
+        true_agents_pos = torch.rand((num_agents, 2)) * area_size
+        anchors_pos = torch.rand((num_anchors, 2)) * area_size
+        anchor_comm_radius = comm_radius
+
+    elif scenario_type == 'hard':
+        # 恶劣场景: 锚点固定(四角+中心), Agent均匀分布
+        true_agents_pos = torch.rand((num_agents, 2)) * area_size
+        center = torch.tensor([[area_size / 2.0, area_size / 2.0]], dtype=torch.float32)
+        fixed_anchors = torch.cat([corner_anchors, center], dim=0)  # 5个固定位置
+        if num_anchors <= 5:
+            anchors_pos = fixed_anchors[:num_anchors]
+        else:
+            extra = torch.rand((num_anchors - 5, 2)) * area_size
+            anchors_pos = torch.cat([fixed_anchors, extra], dim=0)
+        anchor_comm_radius = comm_radius
+
+    elif scenario_type == 'challenge':
+        # 挑战场景: 锚点仅四角, Agent中心聚集, 扩展锚点通信半径, 含NLOS边
+        if num_anchors <= 4:
+            anchors_pos = corner_anchors[:num_anchors]
+        else:
             extra = torch.rand((num_anchors - 4, 2)) * area_size
-            anchors_pos = torch.cat([anchors_pos, extra], dim=0)
+            anchors_pos = torch.cat([corner_anchors, extra], dim=0)
 
         true_agents_pos = (
             torch.randn((num_agents, 2)) * (area_size / 6.0) + (area_size / 2.0)
         )
         true_agents_pos = torch.clamp(true_agents_pos, 10.0, area_size - 10.0)
         anchor_comm_radius = comm_radius * 1.8
+
     else:
-        true_agents_pos = torch.rand((num_agents, 2)) * area_size
-        anchors_pos = torch.rand((num_anchors, 2)) * area_size
-        anchor_comm_radius = comm_radius
+        raise ValueError(f"未知场景类型: {scenario_type}, 可选: normal / hard / challenge")
 
     # 含噪初始估计
     init_std = init_pos_cov ** 0.5

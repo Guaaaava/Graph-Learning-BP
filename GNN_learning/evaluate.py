@@ -36,16 +36,74 @@ from loss import compute_crlb
 import config as config
 
 
+# ================= Baseline 拓扑生成 =================
+import networkx as nx
+
+
+def baseline_mst(data):
+    """MST by measurement variance (优先保留低噪声边)"""
+    N, E = int(data.x.shape[0]), data.edge_index.shape[1]
+    G = nx.Graph()
+    for e in range(E):
+        u, v = data.edge_index[0, e].item(), data.edge_index[1, e].item()
+        G.add_edge(u, v, weight=data.edge_attr[e, 1].item(), idx=e)
+    weights = torch.zeros(E, device=data.x.device)
+    for comp in nx.connected_components(G):
+        sub = G.subgraph(comp)
+        if sub.number_of_edges() == 0:
+            continue
+        for u, v in nx.minimum_spanning_tree(sub, weight='weight').edges():
+            weights[G[u][v]['idx']] = 1.0
+    return weights
+
+
+def baseline_knn(data, k=3):
+    """k-NN: per-agent 保留最近 k 条 agent 边, anchor 边全留"""
+    E = data.edge_index.shape[1]
+    na = int(data.num_agents)
+    is_anc = data.edge_attr[:, 3].bool()
+    agt_mask = ~is_anc
+    weights = torch.zeros(E, device=data.x.device)
+    weights[is_anc] = 1.0
+    row = data.edge_index[0, agt_mask]
+    meas = data.edge_attr[agt_mask, 0]
+    agt_idx = torch.where(agt_mask)[0]
+    for i in range(na):
+        m = (row == i)
+        if m.sum() == 0:
+            continue
+        _, topk = torch.topk(meas[m], k=min(k, int(m.sum())), largest=False)
+        weights[agt_idx[m][topk]] = 1.0
+    return weights
+
+
+def baseline_random(data, keep_ratio=0.5):
+    """随机剪枝: anchor 全留, agent 边随机保留 keep_ratio"""
+    is_anc = data.edge_attr[:, 3].bool()
+    agt_mask = ~is_anc
+    weights = torch.zeros(data.edge_index.shape[1], device=data.x.device)
+    weights[is_anc] = 1.0
+    agt_idx = torch.where(agt_mask)[0]
+    n_keep = max(1, int(len(agt_idx) * keep_ratio))
+    weights[agt_idx[torch.randperm(len(agt_idx))[:n_keep]]] = 1.0
+    return weights
+
+
 # ================= BFS 生成树提取 =================
 def extract_bfs_weights(data):
     """
     从 PyG Data 对象的 Anchor 出发做多源 BFS，返回 0-1 边权重向量。
-    保证所有节点可达（未被 BFS 覆盖的孤立分量做额外 BFS）。
+
+    策略:
+      1. 从所有 Anchor 同时出发做多源 BFS，覆盖所有能连接到锚点的节点
+      2. 对剩余孤立组件: 在稠密图中找最短路径连接到已访问集合，
+         将该路径上的边加入 BFS 树 — 确保每个 Agent 都有到 Anchor 的路径
     """
     E = data.edge_index.shape[1]
     N = data.x.shape[0]
     weights = torch.zeros(E, device=data.x.device)
 
+    # 构建无向邻接表 (稠密图的所有边)
     adj = {i: [] for i in range(N)}
     for e in range(E):
         u = data.edge_index[0, e].item()
@@ -56,6 +114,7 @@ def extract_bfs_weights(data):
     is_anchor = data.x[:, 4].bool()
     anchors = torch.where(is_anchor)[0].tolist()
 
+    # --- 第1步: 从所有 Anchor 出发做 BFS ---
     visited = set(anchors)
     queue = list(anchors)
 
@@ -67,17 +126,39 @@ def extract_bfs_weights(data):
                 queue.append(nxt)
                 weights[e_idx] = 1.0
 
-    for i in range(N):
-        if i not in visited:
-            visited.add(i)
-            queue.append(i)
-            while queue:
-                cur = queue.pop(0)
-                for nxt, e_idx in adj[cur]:
-                    if nxt not in visited:
-                        visited.add(nxt)
-                        queue.append(nxt)
-                        weights[e_idx] = 1.0
+    # --- 第2步: 将孤立组件通过最短路径连接到已访问集合 ---
+    remaining = set(range(N)) - visited
+
+    while remaining:
+        # BFS 从 visited 集合出发，找最近的 remaining 节点
+        parent_edge = {}       # node -> (parent_node, edge_idx)
+        local_visited = set(visited)
+        q = list(visited)
+        found = None
+
+        while q and found is None:
+            cur = q.pop(0)
+            for nxt, e_idx in adj[cur]:
+                if nxt not in local_visited:
+                    local_visited.add(nxt)
+                    parent_edge[nxt] = (cur, e_idx)
+                    q.append(nxt)
+                    if nxt in remaining:
+                        found = nxt
+                        break
+
+        if found is None:
+            break  # 理论上不会发生 (图是连通的)
+
+        # 回溯: 将 found → ... → visited 路径上的所有边加入 BFS 树
+        node = found
+        while node in parent_edge:
+            parent, e_idx = parent_edge[node]
+            weights[e_idx] = 1.0
+            visited.add(node)
+            node = parent
+
+        remaining = set(range(N)) - visited
 
     return weights
 
@@ -185,7 +266,7 @@ def evaluate(quick=False):
     )
 
     # 4. 收集 per-graph 指标
-    topo_names = ['dense', 'bfs', 'gnn']
+    topo_names = ['dense', 'bfs', 'mst', 'knn', 'random', 'gnn']
     # 每张图每条拓扑一个 dict
     per_graph = {name: [] for name in topo_names}
     # 所有 agent 的误差 (用于分位数)
@@ -205,31 +286,41 @@ def evaluate(quick=False):
             agents_true = data.y
             E_total = data.edge_index.shape[1]
 
-            # --- 生成三种拓扑的边掩码 ---
-            dense_w = torch.ones(E_total, device=device)
-            bfs_w = extract_bfs_weights(data)
+            # --- GNN 掩码 (GPU) ---
             gnn_w, _ = model(data, tau=0.1, hard=True)
 
-            # --- 运行粒子 BP ---
-            pos_d, cov_d, _ = bp.run(data, edge_weights=dense_w)
-            pos_b, cov_b, _ = bp.run(data, edge_weights=bfs_w)
-            pos_g, cov_g, _ = bp.run(data, edge_weights=gnn_w)
+            # --- 数据移到 CPU 跑 BP (避免 P×P 矩阵炸显存) ---
+            data_cpu = data.to('cpu')
+            agents_true_cpu = agents_true.to('cpu')
+            gnn_w_cpu = gnn_w.to('cpu')
 
-            # --- CRLB ---
-            crlb_d, _ = compute_crlb(data, dense_w, prior_weight=config.FIM_PRIOR)
-            crlb_b, _ = compute_crlb(data, bfs_w, prior_weight=config.FIM_PRIOR)
-            crlb_g, _ = compute_crlb(data, gnn_w, prior_weight=config.FIM_PRIOR)
+            dense_w = torch.ones(E_total)
+            bfs_w = extract_bfs_weights(data_cpu)
+            mst_w = baseline_mst(data_cpu)
+            knn_w = baseline_knn(data_cpu, k=3)
+            rnd_w = baseline_random(data_cpu, keep_ratio=0.5)
+
+            masks = {
+                'dense': dense_w, 'bfs': bfs_w, 'mst': mst_w,
+                'knn': knn_w, 'random': rnd_w, 'gnn': gnn_w_cpu,
+            }
+
+            # --- 运行粒子 BP (CPU) ---
+            results = {}
+            for name, w in masks.items():
+                pos, cov, _ = bp.run(data_cpu, edge_weights=w)
+                crlb, _ = compute_crlb(data_cpu, w, prior_weight=config.FIM_PRIOR)
+                results[name] = (pos, cov, w, crlb)
 
             # --- 详细指标 ---
-            topo_results = [
-                ('dense', pos_d, cov_d, dense_w, crlb_d),
-                ('bfs',   pos_b, cov_b, bfs_w,   crlb_b),
-                ('gnn',   pos_g, cov_g, gnn_w,   crlb_g),
-            ]
+            topo_results = []
+            for name in ['dense', 'bfs', 'mst', 'knn', 'random', 'gnn']:
+                pos, cov, w, crlb = results[name]
+                topo_results.append((name, pos, cov, w, crlb))
 
             for name, pos, cov, w, crlb in topo_results:
                 rmse, outage, consist, nees, agent_dists = calculate_metrics(
-                    pos, agents_true, cov,
+                    pos, agents_true_cpu, cov,
                     e_th=config.OUTAGE_THRESHOLD, alpha=config.ALPHA,
                 )
                 per_graph[name].append({
@@ -243,8 +334,8 @@ def evaluate(quick=False):
                 all_agent_errors[name].extend(agent_dists.tolist())
 
             count += 1
-            if count % 50 == 0:
-                print(f"  已评估 {count} 张图...")
+            if count % 10 == 0:
+                print(f"  已评估 {count}/{max_graphs} 张图...", flush=True)
 
     # 5. 统计计算
     print(f"\n评估完成，共 {count} 张图。计算统计...\n")
@@ -281,60 +372,76 @@ def evaluate(quick=False):
         }
 
     # 7. 格式化输出
-    d, b, g = stats_summary['dense'], stats_summary['bfs'], stats_summary['gnn']
+    s = {name: stats_summary[name] for name in topo_names}  # dense, bfs, mst, knn, random, gnn
 
     def fm(val, width=8, decimals=3):
-        """format mean ± std"""
         return f"{val['mean']:{width}.{decimals}f} ± {val['std']:.{decimals}f}"
 
     def fm_pct(val, width=7):
-        """format percentage with CI"""
         return (f"{val['mean']*100:{width}.1f}% "
                 f"[{val['ci_low']*100:.0f}–{val['ci_high']*100:.0f}]")
 
-    edge_reduction = (1 - g['edges']['mean'] / d['edges']['mean']) * 100
+    edge_reduction = (1 - s['gnn']['edges']['mean'] / s['dense']['edges']['mean']) * 100
 
-    # 7. LaTeX 行
-    latex_rows = (
-        f"    Dense & {d['edges']['mean']:.0f} & {d['rmse']['mean']:.2f} +/- {d['rmse']['std']:.2f} "
-        f"& {d['crlb']['mean']:.3f} & {d['outage']['mean']*100:.1f} & {d['nees']['mean']:.1f} \\\\\n"
-        f"    BFS   & {b['edges']['mean']:.0f} & {b['rmse']['mean']:.2f} +/- {b['rmse']['std']:.2f} "
-        f"& {b['crlb']['mean']:.3f} & {b['outage']['mean']*100:.1f} & {b['nees']['mean']:.1f} \\\\\n"
-        f"    GNN   & {g['edges']['mean']:.0f} & {g['rmse']['mean']:.2f} +/- {g['rmse']['std']:.2f} "
-        f"& {g['crlb']['mean']:.3f} & {g['outage']['mean']*100:.1f} & {g['nees']['mean']:.1f} \\\\"
+    # LaTeX 行
+    latex_rows = "\n".join(
+        f"    {name.capitalize():>7} & {s[name]['edges']['mean']:.0f} & "
+        f"{s[name]['rmse']['mean']:.2f} +/- {s[name]['rmse']['std']:.2f} & "
+        f"{s[name]['crlb']['mean']:.3f} & {s[name]['outage']['mean']*100:.1f} & "
+        f"{s[name]['nees']['mean']:.1f} \\\\"
+        for name in ['dense', 'bfs', 'mst', 'knn', 'random', 'gnn']
     )
 
+    # 生成汇总表列名
+    col_names = {'dense': 'Dense', 'bfs': 'BFS', 'mst': 'MST',
+                 'knn': 'k-NN', 'random': 'Random', 'gnn': 'GNN'}
+    name_list = ['dense', 'bfs', 'mst', 'knn', 'random', 'gnn']
+
+    def row_fmt(label, key, width=10, decimals=3, pct=False):
+        parts = [f"{label:<18}"]
+        for name in name_list:
+            val = s[name][key]
+            if pct:
+                parts.append(f" | {fm_pct(val, 7):<30}")
+            else:
+                parts.append(f" | {fm(val, width, decimals):<30}")
+        return "".join(parts)
+
+    header = f"{'指标':<18}" + "".join(f" | {col_names[n]:<30}" for n in name_list)
+    sep = "-" * (18 + 32 * len(name_list))
+
     report = f"""
-{'=' * 110}
+{'=' * (18 + 32 * len(name_list))}
 测试集评估结果 ({count} 张图, 粒子 BP, P={num_particles}, iter={bp_iter})
-{'=' * 110}
+{'=' * (18 + 32 * len(name_list))}
 
 【指标汇总 — mean ± std (图间)】
-{'指标':<18} | {'Dense':<32} | {'BFS':<32} | {'GNN':<32}
-{'-' * 110}
-{'边数':<20} | {d['edges']['mean']:<8.0f} ± {d['edges']['std']:<8.0f}     | {b['edges']['mean']:<8.0f} ± {b['edges']['std']:<8.0f}     | {g['edges']['mean']:<8.0f} ± {g['edges']['std']:<8.0f}
-{'RMSE (m)':<20} | {fm(d['rmse'], 8, 3):<32} | {fm(b['rmse'], 8, 3):<32} | {fm(g['rmse'], 8, 3):<32}
-{'CRLB (m)':<20} | {fm(d['crlb'], 8, 4):<32} | {fm(b['crlb'], 8, 4):<32} | {fm(g['crlb'], 8, 4):<32}
-{'中断率 (>3m)':<20} | {fm_pct(d['outage'], 7):<32} | {fm_pct(b['outage'], 7):<32} | {fm_pct(g['outage'], 7):<32}
-{'一致性 (95% χ²)':<20} | {fm_pct(d['consist'], 7):<32} | {fm_pct(b['consist'], 7):<32} | {fm_pct(g['consist'], 7):<32}
-{'NEES':<20} | {fm(d['nees'], 7, 2):<32} | {fm(b['nees'], 7, 2):<32} | {fm(g['nees'], 7, 2):<32}
+{header}
+{sep}
+{row_fmt('边数', 'edges', 8, 0)}
+{row_fmt('RMSE (m)', 'rmse', 8, 3)}
+{row_fmt('CRLB (m)', 'crlb', 8, 4)}
+{row_fmt('中断率 (>3m)', 'outage', pct=True)}
+{row_fmt('一致性 (95% χ²)', 'consist', pct=True)}
+{row_fmt('NEES', 'nees', 8, 2)}
 
 【RMSE 分位数 — per-agent (m)】
-{'分位数':<12} | {'Dense':<12} | {'BFS':<12} | {'GNN':<12}
-{'-' * 50}
-{'P50':<12} | {rmse_quantiles['dense']['p50']:<12.3f} | {rmse_quantiles['bfs']['p50']:<12.3f} | {rmse_quantiles['gnn']['p50']:<12.3f}
-{'P90':<12} | {rmse_quantiles['dense']['p90']:<12.3f} | {rmse_quantiles['bfs']['p90']:<12.3f} | {rmse_quantiles['gnn']['p90']:<12.3f}
-{'P95':<12} | {rmse_quantiles['dense']['p95']:<12.3f} | {rmse_quantiles['bfs']['p95']:<12.3f} | {rmse_quantiles['gnn']['p95']:<12.3f}
-{'Max':<12} | {rmse_quantiles['dense']['max']:<12.3f} | {rmse_quantiles['bfs']['max']:<12.3f} | {rmse_quantiles['gnn']['max']:<12.3f}
+{'分位数':<12} """ + "".join(f" | {col_names[n]:<12}" for n in name_list) + f"""
+{'-' * (12 + 14 * len(name_list))}
+""" + "\n".join(
+    f"{q:<12} " + " ".join(f" | {rmse_quantiles[n][q.lower()]:<12.3f}" for n in name_list)
+    for q in ['P50', 'P90', 'P95', 'Max']
+) + f"""
 
 【关键对比】
-  边减少: {edge_reduction:.1f}%
-  GNN vs Dense RMSE 比: {g['rmse']['mean']/d['rmse']['mean']:.3f}
-  GNN vs BFS  RMSE 比: {g['rmse']['mean']/b['rmse']['mean']:.3f}
+  GNN vs Dense:  RMSE 比 {s['gnn']['rmse']['mean']/s['dense']['rmse']['mean']:.3f}  边减少 {(1-s['gnn']['edges']['mean']/s['dense']['edges']['mean'])*100:.1f}%
+  GNN vs BFS:    RMSE 比 {s['gnn']['rmse']['mean']/s['bfs']['rmse']['mean']:.3f}
+  GNN vs MST:    RMSE 比 {s['gnn']['rmse']['mean']/s['mst']['rmse']['mean']:.3f}
+  GNN vs k-NN:   RMSE 比 {s['gnn']['rmse']['mean']/s['knn']['rmse']['mean']:.3f}
 
 【LaTeX 表格行 (论文用)】
 {latex_rows}
-{'=' * 110}
+{'=' * (18 + 32 * len(name_list))}
 """
 
     print(report)

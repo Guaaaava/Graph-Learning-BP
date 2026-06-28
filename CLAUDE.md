@@ -37,6 +37,7 @@ NEBP/                        # 参考代码 (DGL版粒子BP，后续删除)
 
 ## 运行环境
 
+运行代码前请先：
 ```bash
 conda activate py310
 ```

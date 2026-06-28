@@ -1,3 +1,21 @@
+# IDE
 .vscode/
 
+# Python
 __pycache__/
+*.pyc
+
+# 生成的数据集 (可重新生成)
+GNN_learning/datasets/*.pt
+
+# 训练产物
+GNN_learning/models/*.pth
+GNN_learning/checkpoints/
+
+# 评估输出
+GNN_learning/evaluate_report.txt
+GNN_learning/evaluate_results.json
+
+# 可视化与日志
+GNN_learning/figs/
+GNN_learning/logs/

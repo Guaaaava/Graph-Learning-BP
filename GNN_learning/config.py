@@ -8,7 +8,7 @@ AREA_SIZE = 100.0
 COMM_RADIUS = 30.0
 BASE_NOISE = 0.5
 NOISE_SCALE = 0.05
-SCENARIO_TYPE = 'challenge'
+SCENARIO_TYPE = 'normal'
 
 # 初始位置不确定度 (m²)
 INIT_POS_COV = 25.0   # std ≈ 5m
@@ -32,13 +32,13 @@ TAU_DECAY = 0.98     # 每 epoch 衰减率
 # ================= GIB 损失 =================
 GAMMA = 0.002        # 先验 q(d) = 1/(1+exp(γ·d²)), d=30m→q≈0.14
 LAMBDA_REG = 20.0    # KL 项权重 (距离相关压缩调制)
-SPARSITY_WEIGHT = 150.0  # 稀疏惩罚权重 (均匀压缩基线)
+SPARSITY_WEIGHT = 0  # 稀疏惩罚权重 (均匀压缩基线)
 ETA = 50.0           # 度数约束权重
 FIM_PRIOR = 0.5      # FIM 对角先验 (提高稳定性)
 
 # ================= 粒子 BP =================
 BP_NUM_PARTICLES_TRAIN = 2000
-BP_NUM_PARTICLES_TEST = 500    # 实用评估，最终版改为 10000
+BP_NUM_PARTICLES_TEST = 10000  # 最终评估用 10000 粒子
 BP_NUM_ITER = 3                # iter=3 足够 (P0修复后NEES正常)
 BP_SIGMA_MEAS = 0.5
 BP_INIT_COV = 25.0
