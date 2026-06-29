@@ -92,11 +92,13 @@ def compute_gib_loss(edge_logits, edge_weights, data,
         num_agents = torch.tensor([N_a], device=device)
 
     total_fim = 0.0
+    total_dof = 0  # 总自由度 = Σ 2*N_a，用于归一化
 
     for g in range(batch_size):
         n_start = ptr[g].item()
         n_end = ptr[g + 1].item()
         N_a = int(num_agents[g].item())
+        total_dof += 2 * N_a  # 每 agent 贡献 2 个自由度 (x,y)
 
         edge_mask = (batch[row] == g)
         local_row = row[edge_mask] - n_start
@@ -135,7 +137,8 @@ def compute_gib_loss(edge_logits, edge_weights, data,
         except RuntimeError:
             total_fim += torch.trace(torch.linalg.inv(FIM))
 
-    loss_fim = total_fim / batch_size
+    # 按总自由度归一化: FIM 随 agent 数线性增长, 除以 2*N_a 使量级与 KL 对齐
+    loss_fim = total_fim / total_dof if total_dof > 0 else total_fim / batch_size
 
     # ============================================================
     # 2. 结构压缩: KL(p_θ || q)

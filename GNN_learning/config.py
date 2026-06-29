@@ -8,7 +8,13 @@ AREA_SIZE = 100.0
 COMM_RADIUS = 30.0
 BASE_NOISE = 0.5
 NOISE_SCALE = 0.05
-SCENARIO_TYPE = 'normal'
+SCENARIO_TYPE = 'challenge'
+
+# Agent/Anchor 数量范围 (数据集生成时随机采样)
+NUM_AGENTS_MIN = 25
+NUM_AGENTS_MAX = 35
+NUM_ANCHORS_MIN = 3
+NUM_ANCHORS_MAX = 6
 
 # 初始位置不确定度 (m²)
 INIT_POS_COV = 25.0   # std ≈ 5m
@@ -31,15 +37,14 @@ TAU_DECAY = 0.98     # 每 epoch 衰减率
 
 # ================= GIB 损失 =================
 GAMMA = 0.002        # 先验 q(d) = 1/(1+exp(γ·d²)), d=30m→q≈0.14
-LAMBDA_REG = 20.0    # KL 项权重 (距离相关压缩调制)
-SPARSITY_WEIGHT = 0  # 稀疏惩罚权重 (均匀压缩基线)
-ETA = 50.0           # 度数约束权重
+LAMBDA_REG = 5.0     # KL 项权重 (FIM归一化后, 1-10 即有压缩效果)
+ETA = 20.0           # 度数约束权重
 FIM_PRIOR = 0.5      # FIM 对角先验 (提高稳定性)
 
 # ================= 粒子 BP =================
 BP_NUM_PARTICLES_TRAIN = 2000
 BP_NUM_PARTICLES_TEST = 10000  # 最终评估用 10000 粒子
-BP_NUM_ITER = 3                # iter=3 足够 (P0修复后NEES正常)
+BP_NUM_ITER = 3
 BP_SIGMA_MEAS = 0.5
 BP_INIT_COV = 25.0
 

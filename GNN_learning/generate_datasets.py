@@ -30,8 +30,8 @@ def create_dataset(split_name, num_graphs, seed_offset):
 
     dataset_list = []
     for i in tqdm(range(num_graphs), desc=f"Generating {split_name}"):
-        current_agents = random.randint(25, 45)
-        current_anchors = random.randint(3, 6)
+        current_agents = random.randint(config.NUM_AGENTS_MIN, config.NUM_AGENTS_MAX)
+        current_anchors = random.randint(config.NUM_ANCHORS_MIN, config.NUM_ANCHORS_MAX)
 
         data_dict = generate_localization_network(
             num_agents=current_agents,
