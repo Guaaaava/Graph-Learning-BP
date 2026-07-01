@@ -14,26 +14,24 @@
 
 ## 项目结构
 
+
 ```
-BP/                          # 粒子化非参数BP (PyG)
-  particle_bp.py             #   ParticleBP 类
-
-GNN_learning/                # GNN 图拓扑优化
-  config.py                  #   全局配置
-  model.py                   #   EdgePredictorGNN (5维节点 + 4维边)
-  loss.py                    #   GIB损失 (logdet + KL + degree)
-  dataset.py                 #   PyG Data 适配器
-  generate_network.py        #   单图生成
-  generate_datasets.py       #   批量数据集生成
-  train.py                   #   训练脚本
-  evaluate.py                #   评估脚本 (粒子BP对比)
-  visualize_topology.py      #   拓扑可视化
-
-NBP_ST/                      # BFS 基准
-  BFS_tree.py
-
-NEBP/                        # 参考代码 (DGL版粒子BP，后续删除)
+BP/particle_bp.py                     # 粒子BP
+GNN_learning/config.py                # 配置
+GNN_learning/model.py                 # GNN模型
+GNN_learning/loss.py                  # GIB损失
+GNN_learning/dataset.py               # 数据加载
+GNN_learning/generate_network.py      # 图生成（3种场景）
+GNN_learning/generate_datasets.py     # 批量数据集
+GNN_learning/train.py                 # 训练
+GNN_learning/evaluate.py              # 评估（6种拓扑）
+GNN_learning/visualize_topology.py    # 可视化
+NBP_ST/BFS_tree.py                    # BFS基准
+NEBP/                                 # 参考代码
+CLAUDE.md                             # 项目指令
 ```
+
+### 
 
 ## 运行环境
 
@@ -49,6 +47,20 @@ conda activate py310
 
 ## 工作流
 
-1. `generate_datasets.py` → 生成 train/val/test.pt
-2. `train.py` → 训练 GNN (GIB 损失)
-3. `evaluate.py` → 粒子BP评估三种拓扑 (Dense/BFS/GNN)
+```
+generate_network.py (场景参数)
+    ↓ raw dict {true_agents_pos, init_agents_pos, anchors_pos, edge_index,
+               measurements, edge_variances, pseudo_range_residual, is_anchor_edge}
+    ↓
+dataset.py (组装 PyG Data)
+    ↓ data.x [N,5] + data.edge_attr [E,4] + data.y [N_a,2]
+    ↓
+model.py (GNN前向)
+    ↓ edge_weights ∈ {0,1} (Gumbel-Sigmoid STE)
+    ↓
+particle_bp.py (粒子BP定位，P=10000)
+    ↓ est_pos [N_a,2] + est_cov [N_a,2,2]
+    ↓
+evaluate.py (6种拓扑对比)
+    ↓ RMSE / CRLB / NEES / Outage / Chi2 consistency
+```

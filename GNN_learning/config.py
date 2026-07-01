@@ -42,8 +42,7 @@ ETA = 20.0           # 度数约束权重
 FIM_PRIOR = 0.5      # FIM 对角先验 (提高稳定性)
 
 # ================= 粒子 BP =================
-BP_NUM_PARTICLES_TRAIN = 2000
-BP_NUM_PARTICLES_TEST = 10000  # 最终评估用 10000 粒子
+BP_NUM_PARTICLES_TEST = 10000  # 粒子 BP: 仅评估使用, 训练不涉及
 BP_NUM_ITER = 3
 BP_SIGMA_MEAS = 0.5
 BP_INIT_COV = 25.0
