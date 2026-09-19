@@ -75,6 +75,20 @@ def train_gnn(sparsity_weight=None, lambda_reg=None, eta=None, epochs=None,
         # 温度退火
         tau = max(config.TAU_MIN, _tau_init * (_tau_decay ** epoch))
 
+        # Lambda 退火: 根据 epoch 线性插值
+        if hasattr(config, 'LAMBDA_SCHEDULE') and config.LAMBDA_SCHEDULE:
+            sched = config.LAMBDA_SCHEDULE
+            lam = sched[0][1]  # default
+            for i in range(len(sched) - 1):
+                e0, l0 = sched[i]; e1, l1 = sched[i+1]
+                if e0 <= epoch <= e1:
+                    lam = l0 + (l1 - l0) * (epoch - e0) / (e1 - e0)
+                    break
+            if epoch > sched[-1][0]:
+                lam = sched[-1][1]
+        else:
+            lam = _lam
+
         # ================ 训练 ================
         model.train()
         train_loss, train_fim, train_kl, train_deg = 0, 0, 0, 0
@@ -88,7 +102,7 @@ def train_gnn(sparsity_weight=None, lambda_reg=None, eta=None, epochs=None,
             loss, d = compute_gib_loss(
                 logits, edge_weights, batch,
                 gamma=config.GAMMA,
-                lambda_reg=_lam,
+                lambda_reg=lam,
                 eta=_eta,
                 prior_weight=config.FIM_PRIOR,
                 sparsity_weight=_sp_w,
@@ -124,7 +138,7 @@ def train_gnn(sparsity_weight=None, lambda_reg=None, eta=None, epochs=None,
                 loss, _ = compute_gib_loss(
                     logits, edge_weights, batch,
                     gamma=config.GAMMA,
-                    lambda_reg=_lam,
+                    lambda_reg=lam,
                     eta=_eta,
                     prior_weight=config.FIM_PRIOR,
                     sparsity_weight=_sp_w,

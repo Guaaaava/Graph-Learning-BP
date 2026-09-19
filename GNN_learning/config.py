@@ -37,8 +37,17 @@ TAU_DECAY = 0.98     # 每 epoch 衰减率
 
 # ================= GIB 损失 =================
 GAMMA = 0.002        # 先验 q(d) = 1/(1+exp(γ·d²)), d=30m→q≈0.14
-LAMBDA_REG = 5.0     # KL 项权重 (FIM归一化后, 1-10 即有压缩效果)
-ETA = 20.0           # 度数约束权重
+LAMBDA_REG = 3.0     # KL 项权重 (FIM归一化后)
+ETA = 10.0           # 度数约束权重
+
+# Lambda 退火调度 (epoch -> lambda)
+# 格式: [(epoch_start, lambda_start), (epoch_end, lambda_end)]
+# lambda 在区间内线性插值
+LAMBDA_SCHEDULE = [
+    (0,   0.5),    # epoch 1-50: warmup, focus on accuracy
+    (50,  2.0),    # epoch 51-150: standard training
+    (150, 10.0),   # epoch 151-200: increase compression
+]
 FIM_PRIOR = 0.5      # FIM 对角先验 (提高稳定性)
 
 # ================= 粒子 BP =================
