@@ -1,0 +1,711 @@
+{
+  "baseline_id": "2026-10-22-step-01",
+  "baseline_date": "2026-10-22",
+  "timezone": "Asia/Shanghai",
+  "scope": "Exact pre-documentation local files (including existing ignored bytecode and a figure) and current thesis; excludes .git and subsequently created documents. Python source files are authoritative; bytecode is archived only as historical local state.",
+  "repository_remote": "git@ssh.github.com:Guaaaava/Graph-Learning-BP.git",
+  "branch": "clean",
+  "head_commit": "1c2b0dbfac44896823779e1555905e65b8efd747",
+  "head_subject": "Progress till 9.10: Fix Particle_bp.py, ready to review all code.",
+  "upstream_ref": "origin/clean",
+  "cached_upstream_commit": "1c2b0dbfac44896823779e1555905e65b8efd747",
+  "remote_live_verification": {
+    "status": "user_confirmed",
+    "basis": "User explicitly confirmed that GitHub and the current local version are identical and instructed the agent not to verify remotely.",
+    "independent_network_verification": false
+  },
+  "working_tree_changes_before_documentation": [
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "CLAUDE.md"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "M",
+      "path": "GNN_learning/config.py"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "M",
+      "path": "GNN_learning/evaluate.py"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "M",
+      "path": "GNN_learning/exp_50agent.py"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "M",
+      "path": "GNN_learning/exp_anneal.py"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "M",
+      "path": "GNN_learning/generate_datasets.py"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "M",
+      "path": "GNN_learning/generate_network.py"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/code_qa.md"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0629/challenge_report.txt"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0629/challenge_results.json"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0629/evaluation0629.md"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0629/hard_report.txt"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0629/hard_results.json"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0629/normal_report.txt"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0629/normal_results.json"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0630/evaluate_report_50agent.txt"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0630/evaluate_results_50agent.json"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0630/evaluation0630.md"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0630/exp_50agent.log"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0630/model_small.pth"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/evaluation0630/sweep_small.json"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/plan0704.md"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/tradeoff_curve.png"
+    },
+    {
+      "index_status": " ",
+      "worktree_status": "D",
+      "path": "results/tradeoff_curve_data.md"
+    }
+  ],
+  "tracked_missing_paths": [
+    "CLAUDE.md",
+    "results/code_qa.md",
+    "results/evaluation0629/challenge_report.txt",
+    "results/evaluation0629/challenge_results.json",
+    "results/evaluation0629/evaluation0629.md",
+    "results/evaluation0629/hard_report.txt",
+    "results/evaluation0629/hard_results.json",
+    "results/evaluation0629/normal_report.txt",
+    "results/evaluation0629/normal_results.json",
+    "results/evaluation0630/evaluate_report_50agent.txt",
+    "results/evaluation0630/evaluate_results_50agent.json",
+    "results/evaluation0630/evaluation0630.md",
+    "results/evaluation0630/exp_50agent.log",
+    "results/evaluation0630/model_small.pth",
+    "results/evaluation0630/sweep_small.json",
+    "results/plan0704.md",
+    "results/tradeoff_curve.png",
+    "results/tradeoff_curve_data.md"
+  ],
+  "python_file_count": 22,
+  "paper_original_location": "../GIB-Chap234-1016.tex",
+  "syntax_check": {
+    "method": "Python ast.parse; no project imports or execution",
+    "passed": true,
+    "files_checked": 22
+  },
+  "default_interpreter": {
+    "path": "D:\\SOFTWARE\\Anaconda\\anaconda3\\python.exe",
+    "version": "3.12.7",
+    "dependency_discovery_only": {
+      "torch": false,
+      "torch_geometric": false,
+      "numpy": true,
+      "scipy": true,
+      "networkx": true,
+      "matplotlib": true,
+      "tqdm": true,
+      "pytest": true,
+      "dgl": false
+    }
+  },
+  "files": [
+    {
+      "archive_path": "repository/.gitignore",
+      "size_bytes": 323,
+      "sha256": "e8f667287858a8f42473b0e3908aa00c3fcd0269d497eebf950a4da4248efbb6"
+    },
+    {
+      "archive_path": "repository/.vscode/settings.json",
+      "size_bytes": 132,
+      "sha256": "fb68765dabb197cac60376c803ac61894961b835ca8760705eb89a09e2177551"
+    },
+    {
+      "archive_path": "repository/BP/__init__.py",
+      "size_bytes": 36,
+      "sha256": "4ad20a6e1a5c04aef0cc9115c91aea8639cdd7b1e2ef4e16937ffa29f60e11d7"
+    },
+    {
+      "archive_path": "repository/BP/__pycache__/__init__.cpython-310.pyc",
+      "size_bytes": 185,
+      "sha256": "ab4c82153cce5dda883cd25765d700889b17ccc044506017aeaed64fffcaa157"
+    },
+    {
+      "archive_path": "repository/BP/__pycache__/particle_bp.cpython-310.pyc",
+      "size_bytes": 5676,
+      "sha256": "d52f5cee56bfaa20af0dd4f630fee70ccab16c2aef1ec7f8a91049b23f70d390"
+    },
+    {
+      "archive_path": "repository/BP/__pycache__/particle_bp_v2.cpython-310.pyc",
+      "size_bytes": 5741,
+      "sha256": "0f37815240a918038446a17c771a80ddf5ff03c4854d9d2cc863784817786450"
+    },
+    {
+      "archive_path": "repository/BP/particle_bp.py",
+      "size_bytes": 9360,
+      "sha256": "a9a4a22544000315cef9644f8c564eb6b893265f2102514e95264e49cb6acbf3"
+    },
+    {
+      "archive_path": "repository/GNN_learning/__pycache__/config.cpython-310.pyc",
+      "size_bytes": 1040,
+      "sha256": "fd2f300f27a4f1ea0f4271666d412467ae84bff0cbf2a10adefa4158d5b575f4"
+    },
+    {
+      "archive_path": "repository/GNN_learning/__pycache__/dataset.cpython-310.pyc",
+      "size_bytes": 3029,
+      "sha256": "bd060aad0d5b227a6d02dd140dae5050135fce065f604452e2e75d24d5a0f2e2"
+    },
+    {
+      "archive_path": "repository/GNN_learning/__pycache__/evaluate.cpython-310.pyc",
+      "size_bytes": 13593,
+      "sha256": "22da6e2bdf71b48b7dac84a7d086cbae32c2c3738629e50e4fca00123824c619"
+    },
+    {
+      "archive_path": "repository/GNN_learning/__pycache__/evaluate.cpython-313.pyc",
+      "size_bytes": 21732,
+      "sha256": "2c4644c8e52e3cd4c5bfabfbe9e411842e249166124a9489ceff5838167e6fe2"
+    },
+    {
+      "archive_path": "repository/GNN_learning/__pycache__/exp_50agent.cpython-310.pyc",
+      "size_bytes": 6157,
+      "sha256": "29425cff96c73be6bb302d2bc98eb30e83eaceb98fad1daebfb1a8cef6881a71"
+    },
+    {
+      "archive_path": "repository/GNN_learning/__pycache__/exp_anneal.cpython-310.pyc",
+      "size_bytes": 5166,
+      "sha256": "c95f1d2075b1952b21a8e7c23a39589d58fbb11e550cb27849e7212dfa159f41"
+    },
+    {
+      "archive_path": "repository/GNN_learning/__pycache__/generate_datasets.cpython-310.pyc",
+      "size_bytes": 3187,
+      "sha256": "547cf94be410fd3967a58b193e3b274bb9fb891bbc708df79ee35d97db0d1614"
+    },
+    {
+      "archive_path": "repository/GNN_learning/__pycache__/generate_network.cpython-310.pyc",
+      "size_bytes": 10073,
+      "sha256": "75e499e8a63442002f7fe108f30b697a29f81b225a2d5f5d97fcc32b01b0c9a9"
+    },
+    {
+      "archive_path": "repository/GNN_learning/__pycache__/loss.cpython-310.pyc",
+      "size_bytes": 6597,
+      "sha256": "7937102cdc61b8c2968bf8d4d3e3839a4f485efc7a819c88aa9eea4263e4450a"
+    },
+    {
+      "archive_path": "repository/GNN_learning/__pycache__/model.cpython-310.pyc",
+      "size_bytes": 4689,
+      "sha256": "3d552b863427dd5314fed14bda31e07d7a37202a5bdebd987a8a04418f62856f"
+    },
+    {
+      "archive_path": "repository/GNN_learning/__pycache__/train.cpython-310.pyc",
+      "size_bytes": 4711,
+      "sha256": "6a129b86eb1d35827d0bcab7d5747e2e0afbd2684a7b1a1a5655335b796db260"
+    },
+    {
+      "archive_path": "repository/GNN_learning/config.py",
+      "size_bytes": 2498,
+      "sha256": "e56ec28ddd3fc4e93f770a4cdb99d466ed8f34033a6dbc6b148d10e18c02cbda"
+    },
+    {
+      "archive_path": "repository/GNN_learning/dataset.py",
+      "size_bytes": 4088,
+      "sha256": "31fb9bca51b130f1311ce257b2021bdebda54a816b48ee4ef12e37785a0eaaf5"
+    },
+    {
+      "archive_path": "repository/GNN_learning/evaluate.py",
+      "size_bytes": 15419,
+      "sha256": "93fa4940447a58aa05d47a78e6a3ff035991926759461670b69747d8f8574153"
+    },
+    {
+      "archive_path": "repository/GNN_learning/exp_50agent.py",
+      "size_bytes": 8746,
+      "sha256": "533d631b6299651fb14b581300c36e09576e48d0c670bd90aed31c7c3c8f03cb"
+    },
+    {
+      "archive_path": "repository/GNN_learning/exp_anneal.py",
+      "size_bytes": 7779,
+      "sha256": "bd5a80794b4a3f7192dad63ca8b86474c9d9978b291c4eb45c01e524cd10f6d4"
+    },
+    {
+      "archive_path": "repository/GNN_learning/figs/scenarios_12.png",
+      "size_bytes": 1587201,
+      "sha256": "4abd0aac413176eab8a01c397c4c6d5d405c75bb6d0eb6dbccf0b010ada7a689"
+    },
+    {
+      "archive_path": "repository/GNN_learning/generate_datasets.py",
+      "size_bytes": 3358,
+      "sha256": "99e5775c6af7f7964fb20f0b32fa9857dd155f4a651bd073f776356ee2d57844"
+    },
+    {
+      "archive_path": "repository/GNN_learning/generate_network.py",
+      "size_bytes": 14507,
+      "sha256": "ffa965979935cb3777a63fc86e4c370c151f9da6e82209f9887497d022736a62"
+    },
+    {
+      "archive_path": "repository/GNN_learning/loss.py",
+      "size_bytes": 11242,
+      "sha256": "bc2f6d4d6109e0647a3ccb67b04e1234d8d5fab39eaf898d6707a8db17a7455e"
+    },
+    {
+      "archive_path": "repository/GNN_learning/model.py",
+      "size_bytes": 4828,
+      "sha256": "2b380e56c9d954fc9f44ce5907d82a9c0d94ba2ea5bfff2e068d7c1cc597afe9"
+    },
+    {
+      "archive_path": "repository/GNN_learning/train.py",
+      "size_bytes": 7395,
+      "sha256": "400e62f4d3c28da208de461163b713381b45e388524f3f1da5d52fb77322b8e5"
+    },
+    {
+      "archive_path": "repository/GNN_learning/visualize_topology.py",
+      "size_bytes": 3274,
+      "sha256": "ca2addc24eaa7e9c5a2b108e58efdd4d81833b21723d5c783b2c17b32afd4da0"
+    },
+    {
+      "archive_path": "repository/NBP_ST/BFS_tree.py",
+      "size_bytes": 2954,
+      "sha256": "bc4e1cf041003203631e6575de75f7a1e9137a65833f37b23f40e7a93bdc505c"
+    },
+    {
+      "archive_path": "repository/NBP_ST/__pycache__/BFS_tree.cpython-310.pyc",
+      "size_bytes": 1201,
+      "sha256": "042a2e9ebfa1f7d8f124b0cd4ce5b29be9f4f7cdb06168ee7e0c7a84b3b72393"
+    },
+    {
+      "archive_path": "repository/NEBP/test.py",
+      "size_bytes": 9135,
+      "sha256": "64c70d265974125df70569401cfff513817a016dfacf2a05ea765b973df74daf"
+    },
+    {
+      "archive_path": "repository/NEBP/train.py",
+      "size_bytes": 15266,
+      "sha256": "f021cac5d2ee6e5c4b8e0a92f5cad702e2aab50a34d24704763bdbf0e6f8ed11"
+    },
+    {
+      "archive_path": "repository/NEBP/utils/bp_test.py",
+      "size_bytes": 7785,
+      "sha256": "9bb101c3f52b93bfb81aebcb54dba4ad81d5f7725d647271773f6c73fffdff69"
+    },
+    {
+      "archive_path": "repository/NEBP/utils/cooperative_localization.py",
+      "size_bytes": 7953,
+      "sha256": "ccfca5450aa7a5f056dcaf6ebf966d986fbdc98ea020616b78389c5f41558a09"
+    },
+    {
+      "archive_path": "repository/NEBP/utils/hybrid_test.py",
+      "size_bytes": 7090,
+      "sha256": "309825d3025b4f2329be676b4921afd9899cc6f67eacb6f5300ef0ed061611fc"
+    },
+    {
+      "archive_path": "repository/NEBP/utils/prepare_data.py",
+      "size_bytes": 2337,
+      "sha256": "3cfba79e98f822dd17e525cd77fb416b11a96eb31bd10ce336e27100ac837e7e"
+    },
+    {
+      "archive_path": "repository/NEBP/utils/sqrtm.py",
+      "size_bytes": 414,
+      "sha256": "d35f7720458bd667c99ab02edeabc412208e7b2159df659d0de9ff281189247f"
+    },
+    {
+      "archive_path": "repository/NEBP/utils/synthetic.py",
+      "size_bytes": 15918,
+      "sha256": "ed9022cf68883efd7ef88b0eae04251b8bf11bbbc04dcd3fa7f92ef22ad0f99e"
+    },
+    {
+      "archive_path": "paper/GIB-Chap234-1016.tex",
+      "size_bytes": 43687,
+      "sha256": "03e3b31ae08fef1c050c35c63b00c34cc5e11a2f53645ac11140d85186a96266"
+    }
+  ],
+  "python_inventory": [
+    {
+      "path": "BP/__init__.py",
+      "lines": 1,
+      "top_level_symbols": []
+    },
+    {
+      "path": "BP/particle_bp.py",
+      "lines": 266,
+      "top_level_symbols": [
+        {
+          "name": "ParticleBP",
+          "line": 15
+        },
+        {
+          "name": "particle_bp_batch",
+          "line": 233
+        }
+      ]
+    },
+    {
+      "path": "GNN_learning/config.py",
+      "lines": 74,
+      "top_level_symbols": []
+    },
+    {
+      "path": "GNN_learning/dataset.py",
+      "lines": 106,
+      "top_level_symbols": [
+        {
+          "name": "LocalizationDataset",
+          "line": 18
+        }
+      ]
+    },
+    {
+      "path": "GNN_learning/evaluate.py",
+      "lines": 412,
+      "top_level_symbols": [
+        {
+          "name": "extract_bfs_weights",
+          "line": 40
+        },
+        {
+          "name": "calculate_metrics",
+          "line": 86
+        },
+        {
+          "name": "wilson_ci",
+          "line": 145
+        },
+        {
+          "name": "evaluate",
+          "line": 156
+        }
+      ]
+    },
+    {
+      "path": "GNN_learning/exp_50agent.py",
+      "lines": 193,
+      "top_level_symbols": [
+        {
+          "name": "ds_path",
+          "line": 19
+        },
+        {
+          "name": "mdl_path",
+          "line": 23
+        },
+        {
+          "name": "sweep_params",
+          "line": 31
+        },
+        {
+          "name": "train_model",
+          "line": 71
+        },
+        {
+          "name": "main",
+          "line": 109
+        }
+      ]
+    },
+    {
+      "path": "GNN_learning/exp_anneal.py",
+      "lines": 191,
+      "top_level_symbols": [
+        {
+          "name": "ds_path",
+          "line": 22
+        },
+        {
+          "name": "mdl_path",
+          "line": 26
+        },
+        {
+          "name": "lambda_at_epoch",
+          "line": 33
+        }
+      ]
+    },
+    {
+      "path": "GNN_learning/generate_datasets.py",
+      "lines": 99,
+      "top_level_symbols": [
+        {
+          "name": "set_global_seed",
+          "line": 19
+        },
+        {
+          "name": "create_dataset",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "path": "GNN_learning/generate_network.py",
+      "lines": 336,
+      "top_level_symbols": [
+        {
+          "name": "_grid_anchors",
+          "line": 36
+        },
+        {
+          "name": "_resolve_agent_distribution",
+          "line": 50
+        },
+        {
+          "name": "_sample_agents",
+          "line": 61
+        },
+        {
+          "name": "_anchor_comm_radius",
+          "line": 71
+        },
+        {
+          "name": "generate_localization_network",
+          "line": 99
+        }
+      ]
+    },
+    {
+      "path": "GNN_learning/loss.py",
+      "lines": 317,
+      "top_level_symbols": [
+        {
+          "name": "compute_gib_loss",
+          "line": 21
+        },
+        {
+          "name": "compute_crlb",
+          "line": 206
+        }
+      ]
+    },
+    {
+      "path": "GNN_learning/model.py",
+      "lines": 156,
+      "top_level_symbols": [
+        {
+          "name": "gumbel_sigmoid",
+          "line": 21
+        },
+        {
+          "name": "GNNLayer",
+          "line": 56
+        },
+        {
+          "name": "EdgePredictorGNN",
+          "line": 87
+        }
+      ]
+    },
+    {
+      "path": "GNN_learning/train.py",
+      "lines": 195,
+      "top_level_symbols": [
+        {
+          "name": "train_gnn",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "path": "GNN_learning/visualize_topology.py",
+      "lines": 79,
+      "top_level_symbols": [
+        {
+          "name": "plot_topology_comparison",
+          "line": 6
+        }
+      ]
+    },
+    {
+      "path": "NBP_ST/BFS_tree.py",
+      "lines": 86,
+      "top_level_symbols": [
+        {
+          "name": "extract_bfs_tree_edges",
+          "line": 4
+        }
+      ]
+    },
+    {
+      "path": "NEBP/test.py",
+      "lines": 233,
+      "top_level_symbols": [
+        {
+          "name": "collate",
+          "line": 27
+        },
+        {
+          "name": "main",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "path": "NEBP/train.py",
+      "lines": 348,
+      "top_level_symbols": [
+        {
+          "name": "collate",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "path": "NEBP/utils/bp_test.py",
+      "lines": 188,
+      "top_level_symbols": [
+        {
+          "name": "bp_test",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "path": "NEBP/utils/cooperative_localization.py",
+      "lines": 191,
+      "top_level_symbols": [
+        {
+          "name": "MLP",
+          "line": 26
+        },
+        {
+          "name": "cooperative_localization_solver",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "path": "NEBP/utils/hybrid_test.py",
+      "lines": 174,
+      "top_level_symbols": [
+        {
+          "name": "hybrid_test",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "path": "NEBP/utils/prepare_data.py",
+      "lines": 58,
+      "top_level_symbols": [
+        {
+          "name": "collate",
+          "line": 22
+        },
+        {
+          "name": "prepare_data",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "path": "NEBP/utils/sqrtm.py",
+      "lines": 20,
+      "top_level_symbols": [
+        {
+          "name": "sqrtm_sym",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "path": "NEBP/utils/synthetic.py",
+      "lines": 396,
+      "top_level_symbols": [
+        {
+          "name": "synthetic_dataset",
+          "line": 22
+        },
+        {
+          "name": "get_model_parameters",
+          "line": 202
+        },
+        {
+          "name": "get_tracks",
+          "line": 223
+        },
+        {
+          "name": "get_measurements",
+          "line": 245
+        },
+        {
+          "name": "get_anchor_pos",
+          "line": 303
+        },
+        {
+          "name": "collate",
+          "line": 325
+        }
+      ]
+    }
+  ],
+  "archive": {
+    "file": "source-snapshot.zip",
+    "size_bytes": 1628620,
+    "sha256": "04f319b1e925d025dd677ae2acf04ec260ee6242515c5a4735779d6f20d6a492"
+  },
+  "repository_file_count": 40,
+  "bytecode_file_count": 15
+}

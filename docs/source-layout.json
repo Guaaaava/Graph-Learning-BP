@@ -1,0 +1,31 @@
+{
+  "before_snapshot": "legacy/snapshots/2026-10-23-pre-layout/source-snapshot.zip",
+  "before_manifest": "legacy/snapshots/2026-10-23-pre-layout/manifest.json",
+  "paths": {
+    "GNN_learning/experiment_config.py": "gib4cl/config.py",
+    "GNN_learning/runtime.py": "gib4cl/runtime.py",
+    "GNN_learning/data_schema.py": "gib4cl/data/schema.py",
+    "GNN_learning/dataset.py": "gib4cl/data/dataset.py",
+    "GNN_learning/generate_network.py": "gib4cl/data/network.py",
+    "GNN_learning/generate_datasets.py": "gib4cl/data/generate.py",
+    "GNN_learning/model.py": "gib4cl/learning/model.py",
+    "GNN_learning/objectives.py": "gib4cl/learning/objectives.py",
+    "GNN_learning/train.py": "gib4cl/learning/train.py",
+    "GNN_learning/checkpoints.py": "gib4cl/learning/checkpoints.py",
+    "GNN_learning/metrics.py": "gib4cl/evaluation/metrics.py",
+    "GNN_learning/topology.py": "gib4cl/evaluation/topology.py",
+    "GNN_learning/evaluate.py": "gib4cl/evaluation/evaluate.py",
+    "GNN_learning/visualize_topology.py": "gib4cl/evaluation/plotting.py",
+    "GNN_learning/experiment.py": "gib4cl/experiments/cli.py",
+    "BP/particle_bp.py": "gib4cl/inference/particle_bp.py",
+    "NBP_ST/BFS_tree.py": "gib4cl/inference/spanning_tree.py",
+    "BP/reference.py": "tests/references/particle_posterior.py",
+    "GNN_learning/config.py": "legacy/config_constants.py",
+    "GNN_learning/loss.py": "legacy/fim_objective.py"
+  },
+  "references": {
+    "NEBP/": "legacy/references/NEBP/"
+  },
+  "compatibility": "Legacy import directories are archived under legacy/compat and are no longer supported entry points. Active code imports gib4cl only.",
+  "provenance_fixture": "tests/fixtures/provenance.json"
+}

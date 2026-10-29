@@ -1,0 +1,59 @@
+{
+  "schema_version": "gib4cl.provenance-fixture.v1",
+  "created_date": "2026-10-26",
+  "core": {
+    "gib4cl/inference/particle_bp.py": {
+      "original_path": "BP/particle_bp.py",
+      "original_stage": "stage5",
+      "original_sha256": "e6ebac20c7a5506df4eb7cbde5afe2f4e42d3baba09da3691cf3e060f733c3bc",
+      "semantic_sha256": "10b9fc54256db4b422797623f6401a9706e3ae9cf50de0cc459ab62b53fe5872",
+      "current_semantic_sha256": "d6d8c7dc2b593d7f3da815af8065973e5b087081592b1240294d2adba8b7f693"
+    },
+    "gib4cl/learning/model.py": {
+      "original_path": "GNN_learning/model.py",
+      "original_stage": "stage4",
+      "original_sha256": "f183230dc27e4b99e243ec5ea652bda5af035bbb4adbc5c1f8b1ea19f5a9f6fa",
+      "semantic_sha256": "3b41e6b2850ff55a41e7d6f3df56f6d1c3e6d01b58e202f059694b41afb12741",
+      "current_semantic_sha256": "b6f9007bb659cbcb6e79c814acfc95e7181e8674a897bd79bc4eb2b2ba181277"
+    },
+    "gib4cl/learning/objectives.py": {
+      "original_path": "GNN_learning/objectives.py",
+      "original_stage": "stage3",
+      "original_sha256": "486a9e411824536c14bcd602b3661407358ffec49e88556bf10f91e4121854a3",
+      "semantic_sha256": "faf01d5ccdb8720c29d99c4b0a0817729459c707954378f27e77fcfe5412d8e2"
+    }
+  },
+  "nebp_sources": {
+    "legacy/references/NEBP/test.py": "64c70d265974125df70569401cfff513817a016dfacf2a05ea765b973df74daf",
+    "legacy/references/NEBP/train.py": "f021cac5d2ee6e5c4b8e0a92f5cad702e2aab50a34d24704763bdbf0e6f8ed11",
+    "legacy/references/NEBP/utils/bp_test.py": "9bb101c3f52b93bfb81aebcb54dba4ad81d5f7725d647271773f6c73fffdff69",
+    "legacy/references/NEBP/utils/cooperative_localization.py": "ccfca5450aa7a5f056dcaf6ebf966d986fbdc98ea020616b78389c5f41558a09",
+    "legacy/references/NEBP/utils/hybrid_test.py": "309825d3025b4f2329be676b4921afd9899cc6f67eacb6f5300ef0ed061611fc",
+    "legacy/references/NEBP/utils/prepare_data.py": "3cfba79e98f822dd17e525cd77fb416b11a96eb31bd10ce336e27100ac837e7e",
+    "legacy/references/NEBP/utils/sqrtm.py": "d35f7720458bd667c99ab02edeabc412208e7b2159df659d0de9ff281189247f",
+    "legacy/references/NEBP/utils/synthetic.py": "ed9022cf68883efd7ef88b0eae04251b8bf11bbbc04dcd3fa7f92ef22ad0f99e"
+  },
+  "paper": {
+    "filename": "GIB-Chap234-1016.tex",
+    "sha256": "03e3b31ae08fef1c050c35c63b00c34cc5e11a2f53645ac11140d85186a96266"
+  },
+  "data_fingerprints": {
+    "configs/challenge-los.json": "69fac7fea9224347e9a08c744476a7dde744c0c1ad5fb2ac0f4791ed2be37a41",
+    "configs/hard-los.json": "e98093c89f66366778199abcade74b03f26d34c02257835f6b7dc63993230754",
+    "configs/normal-los.json": "4807fcd0478646ae5ce504b9f768cc86f03f5a442ae504b6840e2ad784f48905",
+    "configs/smoke-data.json": "a22c8bd0cc430ff3b7d8c9d61f571956694aa2403a6b7e2b96c3b863a06c714f",
+    "configs/smoke-objective.json": "a22c8bd0cc430ff3b7d8c9d61f571956694aa2403a6b7e2b96c3b863a06c714f",
+    "configs/smoke-pipeline.json": "a22c8bd0cc430ff3b7d8c9d61f571956694aa2403a6b7e2b96c3b863a06c714f"
+  },
+  "snapshots": {
+    "initial": {
+      "path": "legacy/snapshots/2026-10-22/source-snapshot.zip",
+      "sha256": "04f319b1e925d025dd677ae2acf04ec260ee6242515c5a4735779d6f20d6a492"
+    },
+    "pre_layout": {
+      "path": "legacy/snapshots/2026-10-23-pre-layout/source-snapshot.zip",
+      "sha256": "69c512271b67ce056d2fd10925e6d6396f5115cadb3e70de615841e2e20f29df"
+    }
+  },
+  "scope": "Frozen historical digests; current full semantic digests for model/BP are derived from the immutable sources by removing only fixed algorithm-version metadata. Live archives are optional cross-checks, not packaged runtime dependencies."
+}

@@ -1,0 +1,234 @@
+{
+  "stage": "06-unified-forest-training-evaluation",
+  "date": "2026-10-23",
+  "runtime": {
+    "python": "3.9.23",
+    "torch": "2.7.1+cpu",
+    "torch_geometric": "2.6.1",
+    "system": "Windows",
+    "machine": "AMD64",
+    "numpy": "1.21.2",
+    "device": "cpu",
+    "num_threads": 1,
+    "deterministic_algorithms": true,
+    "pytest": "8.0.2"
+  },
+  "test_run": {
+    "collected": 205,
+    "passed": 204,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 1,
+    "new_pipeline_checks": 34,
+    "prior_checks_passed": 170,
+    "duration_seconds": 46.752,
+    "command": "python -B -m pytest tests/test_experiment_pipeline.py tests/test_particle_bp.py tests/test_model_sampling.py tests/test_objectives.py tests/test_data_contract.py -q -p no:cacheprovider --basetemp=data/test-tmp-stage6-delivery --junitxml=data/stage6-tests.xml",
+    "junit_xml": "data/stage6-tests.xml",
+    "junit_sha256": "a223aa450ebd96409136ff6b7c09ebb00f164d68780b4151dd9b46a02e6726cf"
+  },
+  "entry": "python -m GNN_learning.experiment {generate,train,evaluate,run}",
+  "implemented": [
+    "Single deterministic multi-source BFS forest including unanchored components; no fabricated links",
+    "Explicit initialization versus original-schedule epoch-boundary resume",
+    "Versioned model/optimizer/scheduler/history/Python-NumPy-Torch-CUDA-loader RNG checkpoint with runtime/source/data identity",
+    "Evaluation requires real full checkpoint, records actual checksum and digest, no random fallback",
+    "Paired Dense/BFS/GNN prior supports with stable sample-identity seeds and BP repeats",
+    "Separate ellipse coverage/NEES interval, near-singular covariance policy, graph versus pooled metrics, graph-cluster bootstrap and paired differences",
+    "Strict JSON/Markdown reports with invalid counts and null all-invalid/single-graph quantities",
+    "Side-effect-free compatibility launchers; protected per-run output directories"
+  ],
+  "smoke_config": "configs/smoke-pipeline.json",
+  "config": {
+    "config_version": "gib4cl.config.v1",
+    "experiment_id": "smoke-pipeline-v1",
+    "seed": 100,
+    "data": {
+      "scenario": "smoke",
+      "anchor_layout": "corners",
+      "agent_distribution": "uniform",
+      "num_agents_min": 2,
+      "num_agents_max": 5,
+      "area_size": 20.0,
+      "agent_comm_radius": 15.0,
+      "anchor_comm_radius": 30.0,
+      "cluster_std_ratio": 0.16666666666666666,
+      "cluster_margin_ratio": 0.1,
+      "initial_covariance": 4.0,
+      "base_noise_std": 0.5,
+      "distance_noise_scale": 0.05,
+      "enable_nlos": false,
+      "nlos_ratio": 0.15,
+      "nlos_bias_min": 2.0,
+      "nlos_bias_max": 10.0,
+      "communication_cost_scale": 1.0,
+      "measurement_encoding": "ieee754-binary32-canonical-finite"
+    },
+    "model": {
+      "node_in_dim": 5,
+      "edge_in_dim": 4,
+      "hidden_dim": 16,
+      "num_layers": 2,
+      "architecture_version": "gib4cl.gnn.symmetric-logistic.v1"
+    },
+    "training": {
+      "epochs": 2,
+      "batch_size": 2,
+      "learning_rate": 0.001,
+      "tau_init": 5.0,
+      "tau_min": 0.1,
+      "tau_decay": 0.98,
+      "weight_decay": 0.0001,
+      "max_grad_norm": 5.0,
+      "lr_min": 1e-05,
+      "deterministic": true
+    },
+    "objective": {
+      "beta": 0.02,
+      "gamma": 0.002,
+      "kappa": 0.2,
+      "eta": 1,
+      "prediction_variance_floor": 1e-06,
+      "compute_dtype": "float64"
+    },
+    "bp": {
+      "num_particles": 64,
+      "num_iterations": 6,
+      "algorithm_version": "gib4cl.bp.fixed-prior-cavity.v1",
+      "chunk_size": 32,
+      "compute_dtype": "float64",
+      "measurement_variance_floor": 0.0,
+      "damping": 0.0,
+      "message_tolerance": 1e-08,
+      "early_stopping": false
+    },
+    "evaluation": {
+      "outage_threshold": 3.0,
+      "alpha": 0.05,
+      "edge_threshold": 0.5,
+      "bp_repeats": 2,
+      "bootstrap_samples": 100,
+      "seed": 700,
+      "include_information_proxy": true,
+      "covariance_rtol": 1e-12
+    },
+    "split_sizes": {
+      "train": 3,
+      "val": 2,
+      "test": 2
+    }
+  },
+  "config_sha256": "c32284d47ee2029884cefeefc6e6adeed5061c0b08039c9a1b6c0f480eda0b97",
+  "resume_exact_matches": {
+    "model_state": true,
+    "optimizer_state": true,
+    "scheduler_state": true,
+    "history": true,
+    "rng_state": true,
+    "best_metric": true,
+    "best_epoch": true
+  },
+  "continuous_model_digest": "914d446ee4971ffb8803306fbfd69060857d0b2ec694316d929fb8a756a17ae8",
+  "fine_tuning": {
+    "models": "outputs\\stage6-delivery\\fine\\smoke-pipeline-v1\\0dc47db0fb6274d6\\models",
+    "initial_digest": "914d446ee4971ffb8803306fbfd69060857d0b2ec694316d929fb8a756a17ae8",
+    "source_digest": "914d446ee4971ffb8803306fbfd69060857d0b2ec694316d929fb8a756a17ae8",
+    "final_digest": "26c174bdd7f58b17e239b30a7cc4da1d8d52e8ebf9d0995752c81f49df9696e1",
+    "optimizer_reset": true,
+    "evaluation": "outputs\\stage6-delivery\\fine-evaluation\\evaluations\\smoke-pipeline-v1\\43a3a6f7dd45b810",
+    "checkpoint_sha256": "f8863798539d4a5e783ef4de790bfa18ed919315b765463fe6edae3fec374ec4"
+  },
+  "single_graph_ci_is_null": true,
+  "zero_edge_all_invalid_saved": true,
+  "zero_edge_report": "outputs\\stage6-delivery\\empty-evaluation\\evaluations\\smoke-pipeline-v1\\715ddbd9b89a06b0",
+  "shared_supports_and_seeds_across_topologies": true,
+  "pipeline": {
+    "models": "outputs/stage6-delivery/continuous/smoke-pipeline-v1/0dc47db0fb6274d6/models",
+    "evaluation": "outputs/stage6-delivery/continuous/evaluations/smoke-pipeline-v1/386c184c1f01629f"
+  },
+  "main_evaluation_summaries": {
+    "dense": {
+      "graphs": 2,
+      "bp_trials": 4,
+      "mean_edges": 24.5,
+      "mean_graph_min_ess": 3.1198782711412125,
+      "converged_trial_fraction": 0.0,
+      "invalid_covariance_agent_runs": 0
+    },
+    "bfs": {
+      "graphs": 2,
+      "bp_trials": 4,
+      "mean_edges": 4.5,
+      "mean_graph_min_ess": 25.616494017915272,
+      "converged_trial_fraction": 1.0,
+      "invalid_covariance_agent_runs": 0
+    },
+    "gnn": {
+      "graphs": 2,
+      "bp_trials": 4,
+      "mean_edges": 0.0,
+      "mean_graph_min_ess": 64.0,
+      "converged_trial_fraction": 1.0,
+      "invalid_covariance_agent_runs": 0
+    }
+  },
+  "main_evaluation_graphs": 2,
+  "bp_trials_per_topology": 4,
+  "results_sha256": "e26fdbcc66ad9029e8151789e5522570c4ec5e91ebc2015ad7d3f561977f7a75",
+  "report_sha256": "e98f1665dc4c1943c708c6373776f393f6a633555ef62c9f81f1f017fdd6ae8e",
+  "raw_audit": "outputs/stage6-delivery/verification.json",
+  "raw_audit_sha256": "4b4fb6d7e520bd151423985647a480bd97f170912c8ada7f3fc9189e93365de1",
+  "preserved_core_algorithms": {
+    "BP/particle_bp.py": "e6ebac20c7a5506df4eb7cbde5afe2f4e42d3baba09da3691cf3e060f733c3bc",
+    "GNN_learning/model.py": "f183230dc27e4b99e243ec5ea652bda5af035bbb4adbc5c1f8b1ea19f5a9f6fa",
+    "GNN_learning/objectives.py": "486a9e411824536c14bcd602b3661407358ffec49e88556bf10f91e4121854a3"
+  },
+  "paper_sha256": "03e3b31ae08fef1c050c35c63b00c34cc5e11a2f53645ac11140d85186a96266",
+  "baseline_sha256": "04f319b1e925d025dd677ae2acf04ec260ee6242515c5a4735779d6f20d6a492",
+  "source_sha256": {
+    "BP/particle_bp.py": "e6ebac20c7a5506df4eb7cbde5afe2f4e42d3baba09da3691cf3e060f733c3bc",
+    "GNN_learning/checkpoints.py": "0d488cedee8f8e29327faff23aa1aca014fc8cc994f8a0dd6f81973168b8c23d",
+    "GNN_learning/evaluate.py": "9e90c48148b4ef3ff77fc07f1bee7bf415b3cb1baabaa1266c52e1201177a069",
+    "GNN_learning/exp_50agent.py": "3fec6a3a02b8b553554ce76049b08b4447d1bb376bfd5c208a7e0e890e0e9df1",
+    "GNN_learning/exp_anneal.py": "3fec6a3a02b8b553554ce76049b08b4447d1bb376bfd5c208a7e0e890e0e9df1",
+    "GNN_learning/experiment.py": "86e37fe53cac5fc388ca454c5ea64e7c0b9451b05e70dd5af57ccb774fc26cf1",
+    "GNN_learning/experiment_config.py": "0fff7d4b73254d9f3d838838bae0050d69aa1c8e7e170f5bf3890c1c752fac14",
+    "GNN_learning/loss.py": "6105badae2c672fd036298df1f3181fd6c7e832a37de3e09901e5761c9a94cad",
+    "GNN_learning/metrics.py": "7c8837f5e535f10bf191b9a9dfb5ffc5c291e7957a866d65fbd371e1f3975ddf",
+    "GNN_learning/model.py": "f183230dc27e4b99e243ec5ea652bda5af035bbb4adbc5c1f8b1ea19f5a9f6fa",
+    "GNN_learning/objectives.py": "486a9e411824536c14bcd602b3661407358ffec49e88556bf10f91e4121854a3",
+    "GNN_learning/runtime.py": "43e887eda945adbdaeb2c9780ccff362583dd288f78a0261fd59b45a8c0a92da",
+    "GNN_learning/topology.py": "752e39b2f55ed27c02124be3575888baab6ae0057ea192b63ae47b2eba8b89a9",
+    "GNN_learning/train.py": "1794fce45e5e331e6f2bcfcd8068fa460a47d6a86969c3fa2ec6c1215319f55b",
+    "NBP_ST/BFS_tree.py": "233038209220cac90ce0edb552ad2a3626f15a899941c855c370b1c319b366dd",
+    "configs/challenge-los.json": "da7ab9e276333de74dee5d1456ddd890994fc58452687359bc957de2e9c6fa32",
+    "configs/hard-los.json": "990655a299592bebb676c54e2284b222b2ce9942244f538f15258d044641319a",
+    "configs/normal-los.json": "41564ae96e8a48690e75d505303bc256acd4a24b0a45a78f5b14b41d5f0194f9",
+    "configs/smoke-data.json": "04e63576db966da4914ec246388d380bc82932f13b823dbceb3c6371c826903b",
+    "configs/smoke-objective.json": "ddcfff2afc036242eaa190c71a670dcbab75f91be3cda71fe55be90bc41a71c8",
+    "configs/smoke-pipeline.json": "c32284d47ee2029884cefeefc6e6adeed5061c0b08039c9a1b6c0f480eda0b97",
+    "tests/test_experiment_pipeline.py": "d1ae1942d9bf5aba08cc2031bc130a4d389c26953a737d5094b75327fb02b665",
+    "tests/verify_stage6.py": "3cd5792c9cbfff96e3b9f57b0ccfdac4e11015c6c49d7315f5ef4b112694b9b2"
+  },
+  "data_fingerprints": {
+    "configs/challenge-los.json": "69fac7fea9224347e9a08c744476a7dde744c0c1ad5fb2ac0f4791ed2be37a41",
+    "configs/hard-los.json": "e98093c89f66366778199abcade74b03f26d34c02257835f6b7dc63993230754",
+    "configs/normal-los.json": "4807fcd0478646ae5ce504b9f768cc86f03f5a442ae504b6840e2ad784f48905",
+    "configs/smoke-data.json": "a22c8bd0cc430ff3b7d8c9d61f571956694aa2403a6b7e2b96c3b863a06c714f",
+    "configs/smoke-objective.json": "a22c8bd0cc430ff3b7d8c9d61f571956694aa2403a6b7e2b96c3b863a06c714f",
+    "configs/smoke-pipeline.json": "a22c8bd0cc430ff3b7d8c9d61f571956694aa2403a6b7e2b96c3b863a06c714f"
+  },
+  "api_migration": [
+    "Old train/evaluate module paths delegate to unified CLI",
+    "exp_50agent.py and exp_anneal.py no longer execute historical experiments; use explicit subcommands",
+    "Main evaluate requires best_checkpoint.pt/last_checkpoint.pt; raw model state may only initialize a new compatible training run",
+    "Legacy compute_crlb/compute_legacy_fim_loss remain inactive historical helpers; optional information radius is explicitly auxiliary"
+  ],
+  "smoke_interpretation": "Workflow validation only: two test graphs, two BP repeats. GNN selected empty graph; all dense trials failed six-round convergence tolerance. No formal performance claim.",
+  "limitations": [
+    "CPU workflow verification only; CUDA not available in this environment",
+    "Two-epoch smoke weights and BP settings are verification choices, not formal experiments",
+    "Exact resume verified only at epoch boundaries on the same source/runtime/device family",
+    "Graph bootstrap is conditional on the chosen trained checkpoint; it does not cover training-seed variation",
+    "Formal objective/BP choices, training-seed study, code reclassification and server dependency/resource acceptance remain pending"
+  ]
+}

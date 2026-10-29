@@ -1,0 +1,207 @@
+{
+  "stage": "04-gnn-and-discrete-sampling",
+  "date": "2026-10-22",
+  "runtime": {
+    "python": "3.9.23",
+    "torch": "2.7.1+cpu",
+    "torch_geometric": "2.6.1",
+    "device": "cpu",
+    "tensor_threads": 1,
+    "pytest": "8.0.2"
+  },
+  "architecture_version": "gib4cl.gnn.symmetric-logistic.v1",
+  "test_run": {
+    "passed": 105,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "new_model_sampling_tests": 44,
+    "prior_data_objective_tests": 61,
+    "duration_seconds": 6.827,
+    "command": "python -B -m pytest tests/test_model_sampling.py tests/test_objectives.py tests/test_data_contract.py -q -p no:cacheprovider --basetemp=data/test-tmp-stage4-full --junitxml=data/stage4-tests.xml",
+    "junit_xml": "data/stage4-tests.xml",
+    "junit_sha256": "055caa9e1f1a0b777d092e2555abcda3723c4a194c5fdd209885ce409e0fdab2",
+    "execution_note": "Full suite rerun outside Windows sandbox after temporary-directory WinError 5; no code test failures in successful run"
+  },
+  "implemented": [
+    "Physical edges E; validated bidirectional message arcs 2E, shared raw measurement features",
+    "Raw h0=5 and e=4, no separate encoders or external residual; LayerNorm inside MLPs",
+    "Shared scorer in both endpoint orders; average logits, one decision per physical edge",
+    "Independent Logistic noise log(u)-log1p(-u), open-interval rejection of zero draws",
+    "Strict binary STE; temperature affects relaxation/gradient, not hard Bernoulli law",
+    "Deterministic inference logit>0, probabilities sigmoid(logit), no evaluation RNG draw",
+    "Model architecture version in configs, config fingerprint and state_dict; rejects old weights"
+  ],
+  "independent_checks": [
+    "Neighbor-loop reference against actual MLP/PyG messages; hand-set anchor/agent bidirectional messages",
+    "Node permutation, endpoint reversal, physical/message-edge order, batching and empty graph checks",
+    "Five Bernoulli probabilities, 80000 draws each at temperatures 0.1,1,5, six-sigma tolerance",
+    "120000 paired draws: all four joint probabilities agree with independent Bernoulli products",
+    "Fixed-noise STE exact forward and analytic derivative, extreme/empty and invalid input tests",
+    "No label/diagnostic access; evaluation and independent generator do not advance global RNG",
+    "Actual GNN plus new objective finite nonzero per-layer gradients",
+    "Versioned weights round-trip and unversioned/incompatible weights rejected"
+  ],
+  "smoke_audit": {
+    "training_runs": [
+      "outputs/stage4-smoke/run-a/smoke-data-v1/beaece3f64339965/models",
+      "outputs/stage4-smoke/run-b/smoke-data-v1/beaece3f64339965/models"
+    ],
+    "epochs_per_run": 1,
+    "parameter_tensors_changed": 42,
+    "training_metrics_exactly_reproduced": true,
+    "parameter_tensors_exactly_reproduced": true,
+    "best_final_reload_outputs_equal": true,
+    "history": [
+      {
+        "epoch": 1,
+        "tau": 4.9,
+        "train": {
+          "task": 4.133327393403962,
+          "task_logdet": -1.929493654356501,
+          "task_mahalanobis": 6.062821047760463,
+          "task_nll": 12.097461347844458,
+          "compression": 523.7000536344574,
+          "negative_entropy": -17.085684770757258,
+          "expected_energy": 2621.952550160259,
+          "expected_triangles": 0.7438811247780849,
+          "retained_data_cost": 535.3930570799386,
+          "communication_penalty": 5.243905100320517,
+          "triangle_penalty": 0.14877622495561701,
+          "degree": 1.0,
+          "active_edges": 14.0,
+          "total": 15.60732846609311,
+          "weighted_compression": 10.474001072689148,
+          "weighted_degree": 1.0
+        },
+        "val": {
+          "task": 9.438423208672978,
+          "task_logdet": 3.465735902799726,
+          "task_mahalanobis": 5.972687305873251,
+          "task_nll": 14.033115874696342,
+          "compression": 228.67245177806768,
+          "negative_entropy": -8.253383806763296,
+          "expected_energy": 962.093161326039,
+          "expected_triangles": 0.04670123765160655,
+          "retained_data_cost": 234.99230901464858,
+          "communication_penalty": 1.924186322652078,
+          "triangle_penalty": 0.00934024753032131,
+          "degree": 7.5,
+          "active_edges": 0.0,
+          "total": 21.511872244234333,
+          "weighted_compression": 4.573449035561354,
+          "weighted_degree": 7.5
+        }
+      }
+    ],
+    "splits": {
+      "train": {
+        "graphs": 3,
+        "dataset_sha256": "8b0e5e41a14777b147725dea6a4906233a1eb1ac332913e668d148322ca18db0"
+      },
+      "val": {
+        "graphs": 2,
+        "dataset_sha256": "748fe276496b70f520823dd14131b5e3fedbcb763d7fe040ebfcf0711000557d"
+      },
+      "test": {
+        "graphs": 2,
+        "dataset_sha256": "a31d31a65ce0b89c20abb6f9892ee2ef3ddd2947c48ebaa055d18fe2d1321870"
+      }
+    }
+  },
+  "smoke_graphs": [
+    {
+      "split": "train",
+      "sample_id": "c328c438fcdb96a3586ac581803f185d886f396a50d14409f07c0db017934699:0",
+      "physical_edges": 22,
+      "message_arcs": 44,
+      "selected_edges": 0,
+      "total": 30.326274333896613
+    },
+    {
+      "split": "train",
+      "sample_id": "c328c438fcdb96a3586ac581803f185d886f396a50d14409f07c0db017934699:1",
+      "physical_edges": 22,
+      "message_arcs": 44,
+      "selected_edges": 0,
+      "total": 31.319409972277597
+    },
+    {
+      "split": "train",
+      "sample_id": "c328c438fcdb96a3586ac581803f185d886f396a50d14409f07c0db017934699:2",
+      "physical_edges": 30,
+      "message_arcs": 60,
+      "selected_edges": 0,
+      "total": 37.51104389777775
+    },
+    {
+      "split": "val",
+      "sample_id": "15cbf3ad7679ddeabe1c2e75cb75ac1e3d6d74f713e8e2238082470db90c3ca3:0",
+      "physical_edges": 15,
+      "message_arcs": 30,
+      "selected_edges": 0,
+      "total": 27.171074697157866
+    },
+    {
+      "split": "val",
+      "sample_id": "15cbf3ad7679ddeabe1c2e75cb75ac1e3d6d74f713e8e2238082470db90c3ca3:1",
+      "physical_edges": 9,
+      "message_arcs": 18,
+      "selected_edges": 0,
+      "total": 15.85266978808763
+    },
+    {
+      "split": "test",
+      "sample_id": "16669c7083760cb8aa7ab7775e021d90c5c609270fda83bd17e865b1bd3961b3:0",
+      "physical_edges": 21,
+      "message_arcs": 42,
+      "selected_edges": 0,
+      "total": 28.803210306260137
+    },
+    {
+      "split": "test",
+      "sample_id": "16669c7083760cb8aa7ab7775e021d90c5c609270fda83bd17e865b1bd3961b3:1",
+      "physical_edges": 28,
+      "message_arcs": 56,
+      "selected_edges": 0,
+      "total": 38.49293861897349
+    }
+  ],
+  "raw_smoke_report": "outputs/stage4-smoke/verification.json",
+  "raw_smoke_sha256": "c98c286a97b2699442b7e84beb19fbe2cadf9966ede27f262c6ab7236351648a",
+  "baseline_preservation": {
+    "baseline_archive_sha256": "04f319b1e925d025dd677ae2acf04ec260ee6242515c5a4735779d6f20d6a492",
+    "paper_sha256": "03e3b31ae08fef1c050c35c63b00c34cc5e11a2f53645ac11140d85186a96266",
+    "unchanged_bp_nebp_sources": {
+      "BP/__init__.py": "4ad20a6e1a5c04aef0cc9115c91aea8639cdd7b1e2ef4e16937ffa29f60e11d7",
+      "BP/particle_bp.py": "a9a4a22544000315cef9644f8c564eb6b893265f2102514e95264e49cb6acbf3",
+      "NEBP/test.py": "64c70d265974125df70569401cfff513817a016dfacf2a05ea765b973df74daf",
+      "NEBP/train.py": "f021cac5d2ee6e5c4b8e0a92f5cad702e2aab50a34d24704763bdbf0e6f8ed11",
+      "NEBP/utils/bp_test.py": "9bb101c3f52b93bfb81aebcb54dba4ad81d5f7725d647271773f6c73fffdff69",
+      "NEBP/utils/cooperative_localization.py": "ccfca5450aa7a5f056dcaf6ebf966d986fbdc98ea020616b78389c5f41558a09",
+      "NEBP/utils/hybrid_test.py": "309825d3025b4f2329be676b4921afd9899cc6f67eacb6f5300ef0ed061611fc",
+      "NEBP/utils/prepare_data.py": "3cfba79e98f822dd17e525cd77fb416b11a96eb31bd10ce336e27100ac837e7e",
+      "NEBP/utils/sqrtm.py": "d35f7720458bd667c99ab02edeabc412208e7b2159df659d0de9ff281189247f",
+      "NEBP/utils/synthetic.py": "ed9022cf68883efd7ef88b0eae04251b8bf11bbbc04dcd3fa7f92ef22ad0f99e"
+    }
+  },
+  "source_sha256": {
+    "GNN_learning/experiment_config.py": "bfddd020bbe6bec303542a5e4c0a1335c444ad99be29d452a75f770bd84953db",
+    "GNN_learning/model.py": "f183230dc27e4b99e243ec5ea652bda5af035bbb4adbc5c1f8b1ea19f5a9f6fa",
+    "GNN_learning/train.py": "e8fd1328c76a079fadcc8177a75bc0b875d1145ace31c22070d092c828f5491d",
+    "configs/challenge-los.json": "f91f224d1159c947d647fff0cd4bf7b3e32805958b06fcb34c0f086ce38a6d39",
+    "configs/hard-los.json": "372c1ede3fdcb08f06ee63c8d839c69801c2472a87a43ad3711feb9df25c5120",
+    "configs/normal-los.json": "65dbcfc71f68efb6e90c4b9cfc5bd41edfa2f8e2b80d19a015186e7f0b299abc",
+    "configs/smoke-data.json": "b8b4b523ef12a2555d9bea3d2d0d68b90415a457a76b6414338361c3f1f2c54f",
+    "configs/smoke-objective.json": "58e3d30db01f6f00d78bb97d423ae3baf0cae1d113b9aa1e5114d43fe43ff0e9",
+    "tests/test_model_sampling.py": "ab46f43488f60cbaedc3edc0b37a18492b93806ec10f104a374dcbe7f97a7c7f",
+    "tests/verify_stage4.py": "47ae2b17d064da11ae4d171b26aa97073e598beb2bf0f9d99c8ee493ee7ad4b2"
+  },
+  "limitations": [
+    "CPU only",
+    "one-epoch smoke, no convergence or BP accuracy claim",
+    "verification coefficients only",
+    "optimizer/resume and final BP evaluation pending",
+    "Formal hyperparameters remain unresolved; old evaluation entry and baseline scripts are pending later stages"
+  ]
+}

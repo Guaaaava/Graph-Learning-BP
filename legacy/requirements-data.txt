@@ -1,0 +1,6 @@
+# Data/GNN/BP checks use these versions; no DGL or compiled PyG extensions required.
+torch==2.7.1
+torch-geometric==2.6.1
+pytest==8.0.2
+# Independent posterior references use NumPy; verified with 1.21.2 on Python 3.9.
+numpy>=1.21,<3

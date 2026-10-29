@@ -1,0 +1,85 @@
+{
+  "experiment_id": "smoke-pipeline",
+  "seeds": {
+    "data": 100,
+    "training": 100,
+    "bp": 700,
+    "bootstrap": 700
+  },
+  "data": {
+    "num_agents_min": 2,
+    "num_agents_max": 5,
+    "area_size": 20.0,
+    "comm_radius": 15.0,
+    "initial_covariance": 4.0,
+    "base_noise_std": 0.5,
+    "distance_noise_scale": 0.05,
+    "communication_cost_scale": 1.0,
+    "measurement_encoding": "ieee754-binary32-canonical-finite"
+  },
+  "model": {
+    "node_in_dim": 5,
+    "edge_in_dim": 4,
+    "hidden_dim": 16,
+    "num_layers": 2
+  },
+  "training": {
+    "epochs": 2,
+    "batch_size": 2,
+    "learning_rate": 0.001,
+    "tau_init": 5.0,
+    "tau_min": 0.1,
+    "tau_decay": 0.98,
+    "weight_decay": 0.0001,
+    "max_grad_norm": 5.0,
+    "lr_min": 1e-05,
+    "deterministic": true
+  },
+  "objective": {
+    "beta": 0.02,
+    "gamma": 0.002,
+    "kappa": 0.2,
+    "eta": 1,
+    "prediction_variance_floor": 1e-06,
+    "compute_dtype": "float64"
+  },
+  "bp": {
+    "num_particles": 64,
+    "num_iterations": 6,
+    "chunk_size": 32,
+    "compute_dtype": "float64",
+    "measurement_variance_floor": 0.0,
+    "damping": 0.0,
+    "message_tolerance": 1e-08,
+    "early_stopping": false
+  },
+  "evaluation": {
+    "outage_threshold": 3.0,
+    "alpha": 0.05,
+    "edge_threshold": 0.5,
+    "bp_repeats": 2,
+    "bootstrap_samples": 100,
+    "covariance_rtol": 1e-12,
+    "outage_thresholds": [
+      0.5,
+      1.0,
+      2.0,
+      3.0,
+      5.0,
+      10.0
+    ],
+    "coverage_levels": [
+      0.5,
+      0.8,
+      0.9,
+      0.95,
+      0.99
+    ],
+    "ess_fraction_threshold": 0.1
+  },
+  "split_sizes": {
+    "train": 3,
+    "val": 2,
+    "test": 2
+  }
+}

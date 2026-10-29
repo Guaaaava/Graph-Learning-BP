@@ -1,0 +1,11 @@
+# Stable production-source checksums across Windows and Linux checkouts.
+*.py text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.ini text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# External references and immutable snapshots retain their original bytes.
+legacy/** -text

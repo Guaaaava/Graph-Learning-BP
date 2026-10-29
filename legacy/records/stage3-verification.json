@@ -1,0 +1,147 @@
+{
+  "stage": "03-paper-aligned-training-objective",
+  "date": "2026-10-22",
+  "runtime": {
+    "python": "3.9.23",
+    "torch": "2.7.1+cpu",
+    "torch_geometric": "2.6.1",
+    "pytest": "8.0.2",
+    "device": "cpu"
+  },
+  "test_run": {
+    "passed": 61,
+    "failed": 0,
+    "skipped": 0,
+    "new_objective_tests": 31,
+    "data_regression_tests": 30,
+    "duration_seconds": 6.308,
+    "command": "python -B -m pytest tests/test_objectives.py tests/test_data_contract.py -q -p no:cacheprovider --basetemp=data/test-tmp-stage3b --junitxml=data/stage3-tests.xml"
+  },
+  "independent_checks": [
+    "single-anchor closed-form precision/information/mean/covariance",
+    "full Gaussian NLL against MultivariateNormal",
+    "finite-difference range Jacobian",
+    "all 8 masks: exact KL plus partition constant and gradient",
+    "smooth task, covariance, and compression gradcheck",
+    "STE degree derivative and total chain rule",
+    "graph-average batching and node permutation"
+  ],
+  "smoke_configuration": "configs/smoke-objective.json",
+  "coefficients_for_verification_only": {
+    "beta": 0.02,
+    "gamma": 0.002,
+    "kappa": 0.2,
+    "eta": 1.0,
+    "prediction_variance_floor": 1e-06,
+    "compute_dtype": "float64"
+  },
+  "smoke_graphs": 7,
+  "smoke_splits": {
+    "train": {
+      "graphs": 3,
+      "metrics": {
+        "task": 4.198870940059528,
+        "task_logdet": -5.335563456201181,
+        "task_mahalanobis": 9.53443439626071,
+        "task_nll": 12.163004894500025,
+        "compression": 666.1217007904697,
+        "negative_entropy": -16.215735526286515,
+        "expected_energy": 3348.2758280160438,
+        "expected_triangles": 1.5362092188971195,
+        "retained_data_cost": 675.3336428169447,
+        "communication_penalty": 6.696551656032088,
+        "triangle_penalty": 0.30724184377942393,
+        "degree": 0.0,
+        "active_edges": 24.666666666666668,
+        "total": 17.521304955868924,
+        "weighted_compression": 13.322434015809394,
+        "weighted_degree": 0.0
+      },
+      "dataset_sha256": "8b0e5e41a14777b147725dea6a4906233a1eb1ac332913e668d148322ca18db0"
+    },
+    "val": {
+      "graphs": 2,
+      "metrics": {
+        "task": 16.896493068608187,
+        "task_logdet": -2.398344542516299,
+        "task_mahalanobis": 19.294837611124485,
+        "task_nll": 21.49118573463155,
+        "compression": 319.3711046228389,
+        "negative_entropy": -7.946374114711251,
+        "expected_energy": 1341.0253445345202,
+        "expected_triangles": 0.1100181459591917,
+        "retained_data_cost": 324.6134244192893,
+        "communication_penalty": 2.6820506890690403,
+        "triangle_penalty": 0.02200362919183834,
+        "degree": 0.0,
+        "active_edges": 12.0,
+        "total": 23.283915161064968,
+        "weighted_compression": 6.387422092456778,
+        "weighted_degree": 0.0
+      },
+      "dataset_sha256": "748fe276496b70f520823dd14131b5e3fedbcb763d7fe040ebfcf0711000557d"
+    },
+    "test": {
+      "graphs": 2,
+      "metrics": {
+        "task": 1.8502367821443608,
+        "task_logdet": -4.726479089858843,
+        "task_mahalanobis": 6.576715872003204,
+        "task_nll": 10.120683580986416,
+        "compression": 654.9933910964876,
+        "negative_entropy": -16.18280350741194,
+        "expected_energy": 3659.2273284791813,
+        "expected_triangles": 0.8219693394923787,
+        "retained_data_cost": 663.6933460790426,
+        "communication_penalty": 7.318454656958362,
+        "triangle_penalty": 0.16439386789847577,
+        "degree": 0.0,
+        "active_edges": 24.5,
+        "total": 14.950104604074111,
+        "weighted_compression": 13.09986782192975,
+        "weighted_degree": 0.0
+      },
+      "dataset_sha256": "a31d31a65ce0b89c20abb6f9892ee2ef3ddd2947c48ebaa055d18fe2d1321870"
+    }
+  },
+  "single_optimizer_step": {
+    "loss": 18.347994380113935,
+    "gradient_norm": 28.399153518948346,
+    "parameter_tensors_changed": 46,
+    "checkpoint_written": false
+  },
+  "canonical_loss_and_primary_trainer_use_new_objective": true,
+  "baseline_archive_and_paper_unchanged": true,
+  "stage2_smoke_data_unchanged": true,
+  "untouched_algorithm_sources": [
+    "BP/__init__.py",
+    "BP/particle_bp.py",
+    "GNN_learning/model.py",
+    "NEBP/test.py",
+    "NEBP/train.py",
+    "NEBP/utils/bp_test.py",
+    "NEBP/utils/cooperative_localization.py",
+    "NEBP/utils/hybrid_test.py",
+    "NEBP/utils/prepare_data.py",
+    "NEBP/utils/sqrtm.py",
+    "NEBP/utils/synthetic.py"
+  ],
+  "paper_equation_labels_retained": 48,
+  "source_sha256": {
+    "GNN_learning/objectives.py": "486a9e411824536c14bcd602b3661407358ffec49e88556bf10f91e4121854a3",
+    "GNN_learning/loss.py": "6105badae2c672fd036298df1f3181fd6c7e832a37de3e09901e5761c9a94cad",
+    "GNN_learning/train.py": "88318366053e90923652aecc8183a1df2f38bdae547dd4e89fd90cd60e278b26",
+    "GNN_learning/experiment_config.py": "50bf8615397af8652f15a7680e8ffba3737d6f3ba3305830a89511c439653018",
+    "GNN_learning/exp_50agent.py": "2ad64977289dc4d1b759690e86ce2d3eff2f7ee6274d0460986590fc60a7e430",
+    "GNN_learning/exp_anneal.py": "94e51cb480af29ab72678a7392d9f080fba12ed6c5bac8eecf863fb0e7da017d",
+    "configs/smoke-objective.json": "656bf78bb2d2c1697688d3dedb1bf8f683ebd54887cf6fc479c6dee1682897a2",
+    "tests/test_objectives.py": "a337b5c2103b18d2ae62ad4a927b49d67b338a6819fd595cf14ccd66f46a0b4f"
+  },
+  "scope_exclusions": [
+    "formal coefficient tuning",
+    "GNN symmetry/message/sampling correction",
+    "particle BP correctness",
+    "legacy CRLB evaluation",
+    "full training and server/GPU validation"
+  ]
+}

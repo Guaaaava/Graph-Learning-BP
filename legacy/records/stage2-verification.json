@@ -1,0 +1,87 @@
+{
+  "stage": "02-data-contract-and-configuration",
+  "date": "2026-10-22",
+  "baseline_id": "2026-10-22-step-01",
+  "runtime": {
+    "python": "3.9.23",
+    "torch": "2.7.1+cpu",
+    "torch_geometric": "2.6.1",
+    "pytest": "8.0.2",
+    "device": "cpu"
+  },
+  "test_run": {
+    "passed": 30,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 6.289,
+    "command": "python -B -m pytest tests/test_data_contract.py -q -p no:cacheprovider --basetemp=data/test-tmp-stage2e --junitxml=data/stage2-tests.xml"
+  },
+  "smoke_configuration": "configs/smoke-data.json",
+  "smoke_data_root": "data/stage2-smoke",
+  "splits": {
+    "train": {
+      "graphs": 3,
+      "agents_per_graph": [
+        4,
+        4,
+        5
+      ],
+      "physical_edges": 74,
+      "directed_message_edges": 148,
+      "agent_triangles": 18,
+      "dataset_id": "436968345638bc4e10a9481373be8c9fddcd4b43a1a34d9cfc609dabc3ffbca6",
+      "dataset_sha256": "8b0e5e41a14777b147725dea6a4906233a1eb1ac332913e668d148322ca18db0"
+    },
+    "val": {
+      "graphs": 2,
+      "agents_per_graph": [
+        3,
+        2
+      ],
+      "physical_edges": 24,
+      "directed_message_edges": 48,
+      "agent_triangles": 1,
+      "dataset_id": "3eac643578dbd00c83446d47cba1d7890a6dff19ddbbf0c273d6719afb591c48",
+      "dataset_sha256": "748fe276496b70f520823dd14131b5e3fedbcb763d7fe040ebfcf0711000557d"
+    },
+    "test": {
+      "graphs": 2,
+      "agents_per_graph": [
+        4,
+        5
+      ],
+      "physical_edges": 49,
+      "directed_message_edges": 98,
+      "agent_triangles": 7,
+      "dataset_id": "cbb3c5997bc0c3b175d01c71a46a9ee4356ba6612f92de803723eb0660303687",
+      "dataset_sha256": "a31d31a65ce0b89c20abb6f9892ee2ef3ddd2947c48ebaa055d18fe2d1321870"
+    }
+  },
+  "cross_split_sample_seeds_unique": true,
+  "cross_split_sample_ids_unique": true,
+  "generated_source_checksums_match_current_code": true,
+  "baseline_archive_and_paper_unchanged": true,
+  "untouched_algorithm_sources": [
+    "BP/__init__.py",
+    "BP/particle_bp.py",
+    "GNN_learning/loss.py",
+    "GNN_learning/model.py",
+    "NEBP/test.py",
+    "NEBP/train.py",
+    "NEBP/utils/bp_test.py",
+    "NEBP/utils/cooperative_localization.py",
+    "NEBP/utils/hybrid_test.py",
+    "NEBP/utils/prepare_data.py",
+    "NEBP/utils/sqrtm.py",
+    "NEBP/utils/synthetic.py"
+  ],
+  "document_links_checked": 82,
+  "paper_equation_labels_retained": 48,
+  "untrained_legacy_gnn_input_interface_check": "passed for all three batches; not algorithm validation",
+  "scope_exclusions": [
+    "training objective correctness",
+    "GNN sampling/symmetry correction",
+    "BP correctness",
+    "GPU/server validation"
+  ]
+}

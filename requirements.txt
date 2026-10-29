@@ -1,0 +1,6 @@
+# Versions used by the current data/GNN/BP and CPU acceptance implementation.
+# This is a dependency list, not a validated server CUDA environment lock.
+torch==2.7.1
+torch-geometric==2.6.1
+pytest==8.0.2
+numpy>=1.21,<3
