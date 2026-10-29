@@ -30,13 +30,6 @@ generate_network.py (场景参数)
 | hard | corners+center | rand | 0% | R | ~150 |
 | challenge | corners only | cluster | 15% | 1.8R | ~380 |
 
-## 粒子BP 四步
-
-1. **Anchor权重**: `log_w[i] += -(||p_i - a_k|| - z)² / (2σ²)`
-2. **Agent消息**: `msg_v→u = Σ_v exp(-(d(p_u,p_v)-z)²/(2σ²)) · belief_v`
-3. **信念更新**: `belief = softmax(log_anchor + Σ log(msg))`
-4. **ESS重采样**: if `1/Σw² < P/2` → multinomial resample + roughening noise
-
 ## 评估6种拓扑
 
 | 拓扑 | 生成方式 | 文件位置 |
@@ -70,16 +63,6 @@ generate_network.py (场景参数)
 | 边评分器   | Linear(192→64→32→1)                               |
 | 输出       | Gumbel-Sigmoid STE ({0,1} 硬掩码)                 |
 | 参数量     | 102,721                                           |
-
-### H. 粒子 BP 算法
-
-| 步骤          | 操作                                                 | 位置               |
-| ------------- | ---------------------------------------------------- | ------------------ |
-| 1. 初始化     | 从 N(init_pos, 25) 采样 P 个 2D 粒子                 | particle_bp.py:106 |
-| 2. Anchor权重 | log_w += -(‖p_i - a_k‖-z)² / (2σ²)                   | particle_bp.py:132 |
-| 3. Agent消息  | msg_v→u = Σ_v exp(-(d(p_u,p_v)-z)²/(2σ²)) * belief_v | particle_bp.py:157 |
-| 4. 信念更新   | belief = softmax(anchor_log + Σ agent_log)           | particle_bp.py:173 |
-| 5. 重采样     | ESS < P/2 时 multinomial + roughening noise          | particle_bp.py:186 |
 
 ## Q&A
 

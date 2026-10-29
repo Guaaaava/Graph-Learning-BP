@@ -95,7 +95,14 @@ def calculate_metrics(est_pos, true_pos, est_cov, e_th=3.0, alpha=0.05):
 
     Returns
     -------
-    rmse, outage_prob, consistency_rate, mean_nees, per_agent_errors
+    dict
+        rmse         : float    图级 RMSE (m)
+        outage       : float    图级中断比例 (agent 误差 > e_th 的占比)
+        consist      : float    图级一致性率 (NEES 落在 95% χ² 区间内的占比)
+        nees         : float    图级平均 NEES (仅统计有效样本)
+        dists        : (N,)     每个 agent 的定位误差
+        consist_mask : (N,) bool  每个 agent 的 χ² 检验是否通过
+        nees_invalid : int      协方差奇异、NEES 无法计算的 agent 数
     """
     N = est_pos.shape[0]
     errors = est_pos - true_pos
@@ -117,12 +124,22 @@ def calculate_metrics(est_pos, true_pos, est_cov, e_th=3.0, alpha=0.05):
     nees_arr = np.array(nees_vals)
     r1 = stats.chi2.ppf(alpha / 2, df=2)
     r2 = stats.chi2.ppf(1 - alpha / 2, df=2)
-    consistent = ((nees_arr >= r1) & (nees_arr <= r2)).sum()
-    consistency = consistent / N if N > 0 else 0
-    valid = nees_arr[nees_arr != float('inf')]
-    mean_nees = np.mean(valid) if len(valid) > 0 else 0.0
+    # 协方差奇异(inf/nan)的 agent 计入"未通过一致性检验", 不静默丢弃;
+    # 但它们的 NEES 无法参与均值, 故单独计数上报。
+    valid_mask = np.isfinite(nees_arr)
+    consist_mask = valid_mask & (nees_arr >= r1) & (nees_arr <= r2)
+    consistency = consist_mask.sum() / N if N > 0 else 0
+    mean_nees = float(np.mean(nees_arr[valid_mask])) if valid_mask.any() else 0.0
 
-    return rmse, outage, consistency, mean_nees, dists.cpu().numpy()
+    return {
+        'rmse': rmse,
+        'outage': outage,
+        'consist': consistency,
+        'nees': mean_nees,
+        'dists': dists.cpu().numpy(),
+        'consist_mask': consist_mask,
+        'nees_invalid': int((~valid_mask).sum()),
+    }
 
 
 def wilson_ci(p, n, z=1.96):
@@ -190,6 +207,8 @@ def evaluate(quick=False):
     per_graph = {name: [] for name in topo_names}
     # 所有 agent 的误差 (用于分位数)
     all_agent_errors = {name: [] for name in topo_names}
+    # 所有 agent 的 χ² 一致性标志 (用于 Wilson CI — 必须按 agent 汇总)
+    all_agent_consist = {name: [] for name in topo_names}
 
     count = 0
 
@@ -228,19 +247,21 @@ def evaluate(quick=False):
             ]
 
             for name, pos, cov, w, crlb in topo_results:
-                rmse, outage, consist, nees, agent_dists = calculate_metrics(
+                m = calculate_metrics(
                     pos, agents_true, cov,
                     e_th=config.OUTAGE_THRESHOLD, alpha=config.ALPHA,
                 )
                 per_graph[name].append({
-                    'rmse': rmse,
+                    'rmse': m['rmse'],
                     'crlb': crlb,
-                    'outage': outage,
-                    'consist': consist,
-                    'nees': nees,
+                    'outage': m['outage'],
+                    'consist': m['consist'],
+                    'nees': m['nees'],
+                    'nees_invalid': m['nees_invalid'],
                     'edges': (w > 0.5).sum().item(),
                 })
-                all_agent_errors[name].extend(agent_dists.tolist())
+                all_agent_errors[name].extend(m['dists'].tolist())
+                all_agent_consist[name].extend(m['consist_mask'].tolist())
 
             count += 1
             if count % 50 == 0:
@@ -249,25 +270,34 @@ def evaluate(quick=False):
     # 5. 统计计算
     print(f"\n评估完成，共 {count} 张图。计算统计...\n")
 
-    def summarize(records):
-        """records: list of dicts"""
+    def summarize(records, agent_errs, agent_consist):
+        """图级 mean±std + 按 agent 汇总的 Wilson CI。
+
+        CI 必须按 agent 汇总: 图级指标是"每图 agent 比例"的均值,
+        不构成二项比例 k/n, 直接喂给 wilson_ci 会得到无意义的区间。
+        """
         keys = ['rmse', 'crlb', 'outage', 'consist', 'nees', 'edges']
         result = {}
         for k in keys:
             vals = np.array([r[k] for r in records])
             result[k] = {'mean': np.mean(vals), 'std': np.std(vals, ddof=1)}
-        # 中断率和一致性用 Wilson CI (以 agent 为单位)
-        n_total_outage = sum(1 for r in records for _ in range(1))  # approximation
-        # 使用图级 outage 来计算 CI
-        outage_mean = result['outage']['mean']
-        consist_mean = result['consist']['mean']
-        result['outage']['ci_low'], result['outage']['ci_high'] = wilson_ci(outage_mean, len(records))
-        result['consist']['ci_low'], result['consist']['ci_high'] = wilson_ci(consist_mean, len(records))
+
+        # 奇异协方差样本数 (不静默丢弃, 单独上报)
+        invalid = np.array([r['nees_invalid'] for r in records])
+        result['nees_invalid'] = {'mean': np.mean(invalid), 'total': int(invalid.sum())}
+
+        errs = np.asarray(agent_errs, dtype=float)
+        flags = np.asarray(agent_consist, dtype=float)
+        result['outage']['ci_low'], result['outage']['ci_high'] = wilson_ci(
+            float((errs > config.OUTAGE_THRESHOLD).mean()), len(errs))
+        result['consist']['ci_low'], result['consist']['ci_high'] = wilson_ci(
+            float(flags.mean()), len(flags))
         return result
 
     stats_summary = {}
     for name in topo_names:
-        stats_summary[name] = summarize(per_graph[name])
+        stats_summary[name] = summarize(
+            per_graph[name], all_agent_errors[name], all_agent_consist[name])
 
     # 6. RMSE 分位数
     rmse_quantiles = {}
@@ -309,7 +339,7 @@ def evaluate(quick=False):
 测试集评估结果 ({count} 张图, 粒子 BP, P={num_particles}, iter={bp_iter})
 {'=' * 110}
 
-【指标汇总 — mean ± std (图间)】
+【指标汇总 — mean ± std (图间); 中断率/一致性的 CI 按 agent 汇总 (Wilson 95%)】
 {'指标':<18} | {'Dense':<32} | {'BFS':<32} | {'GNN':<32}
 {'-' * 110}
 {'边数':<20} | {d['edges']['mean']:<8.0f} ± {d['edges']['std']:<8.0f}     | {b['edges']['mean']:<8.0f} ± {b['edges']['std']:<8.0f}     | {g['edges']['mean']:<8.0f} ± {g['edges']['std']:<8.0f}
@@ -318,6 +348,7 @@ def evaluate(quick=False):
 {'中断率 (>3m)':<20} | {fm_pct(d['outage'], 7):<32} | {fm_pct(b['outage'], 7):<32} | {fm_pct(g['outage'], 7):<32}
 {'一致性 (95% χ²)':<20} | {fm_pct(d['consist'], 7):<32} | {fm_pct(b['consist'], 7):<32} | {fm_pct(g['consist'], 7):<32}
 {'NEES':<20} | {fm(d['nees'], 7, 2):<32} | {fm(b['nees'], 7, 2):<32} | {fm(g['nees'], 7, 2):<32}
+{'NEES 奇异样本数':<20} | {d['nees_invalid']['total']:<32.0f} | {b['nees_invalid']['total']:<32.0f} | {g['nees_invalid']['total']:<32.0f}
 
 【RMSE 分位数 — per-agent (m)】
 {'分位数':<12} | {'Dense':<12} | {'BFS':<12} | {'GNN':<12}
