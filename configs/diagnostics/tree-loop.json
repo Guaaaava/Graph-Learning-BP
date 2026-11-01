@@ -1,0 +1,28 @@
+{
+  "purpose": "study",
+  "conditions": [
+    {"name": "corridor", "centers": [[0, 0], [10, 1], [20, 0]], "cases": 200, "range_std": 0.5, "prior_std": 1.0},
+    {"name": "equilateral", "centers": [[0, 0], [10, 17.32050807568877], [20, 0]], "cases": 100, "range_std": 0.5, "prior_std": 1.0}
+  ],
+  "num_particles": 256,
+  "particle_grid": [128, 256, 512],
+  "repeats": 3,
+  "iterations": 50,
+  "chunk_size": 256,
+  "message_tolerance": 1e-8,
+  "damping": 0.0,
+  "data_seed": 1029,
+  "particle_seed": 700,
+  "bootstrap_seed": 1700,
+  "bootstrap_samples": 2000,
+  "coverage_levels": [0.5, 0.8, 0.9, 0.95, 0.99],
+  "pilot_cases": 20,
+  "continuous_cases": 20,
+  "quadrature_orders": [9, 13, 17, 25, 33, 41],
+  "quadrature_tolerance": 0.01,
+  "particle_ratio_tolerance": 0.02,
+  "max_reference_particles": 2048,
+  "tree_tolerance": 1e-8,
+  "topologies": ["tree", "loop"],
+  "threads": 1
+}

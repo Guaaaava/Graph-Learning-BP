@@ -2,6 +2,12 @@
 
 当前目录只保留一套生产实现：`gib4cl/`。原有 BP、GNN_learning、NBP_ST 兼容目录、旧 FIM、NEBP、旧阶段脚本和快照均集中在 `legacy/`，不再是顶层入口，也不参与发布包运行。
 
+第二章树／单环粒子 BP 独立实验已提供[运行说明](docs/tree-loop-experiment.md)与[实验计划](docs/tree-loop-overconfidence-plan.md)。该入口不训练 GNN，支持精确后验参照、数值预实验、成对统计和左右对照出图。
+
+关于 finite support、后验可信区间、覆盖率和 NEES 卡方检验的读法，见[指标与图形解读](docs/tree-loop-reader-guide.md)；七节点树和 3／4／5 环拓展见[拓展实验说明](docs/tree-loop-extensions.md)。
+
+当前论文图表暂不使用 NEES，校准图采用阴影置信带，正文与附录的组织见[选图建议](docs/tree-loop-paper-selection.md)。
+
 当前只有一个生产场景：四角加中心五个锚点、智能体在整个正方形区域均匀分布、LOS 加性高斯测距。所有测量边使用同一个 `comm_radius`，默认 30 m。正式配置为 [experiment.json](configs/experiment.json)；[smoke-pipeline.json](configs/smoke-pipeline.json) 使用相同规则的小规模数据检查流程。正式 BP 预算、验证规则及损失系数的选择流程见 [实验选择方案](docs/experiment-selection.md)。
 
 本地只检查场景、Dense/BFS 和示例选边掩码时，可运行 `python -B -m tools.preview_network --num-agents 30`，输出图片、配置及原始图。脚本位于 `tools/`，操作说明见 [本地模块测试](docs/local-module-tests.md)。
