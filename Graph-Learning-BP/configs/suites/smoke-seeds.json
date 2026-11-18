@@ -1,0 +1,15 @@
+{
+  "suite_id": "smoke-seeds",
+  "base_config": "../smoke-pipeline.json",
+  "training_seeds": [
+    101,
+    102
+  ],
+  "bp_seeds": [
+    700,
+    701
+  ],
+  "split": "test",
+  "max_graphs": null,
+  "seed_bootstrap_samples": 100
+}

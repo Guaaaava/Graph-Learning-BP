@@ -1,0 +1,23 @@
+{
+  "schema": "gib4cl.night-batch.v1",
+  "name": "formal-iteration-first-batch",
+  "config": "configs/experiment.json",
+  "protocol": "configs/selection/protocol.json",
+  "device": "cuda",
+  "threads": 1,
+  "budget": {
+    "max_seconds": 7200,
+    "max_units": 2,
+    "epochs_per_slice": 1,
+    "unit_estimate_seconds": null,
+    "estimate_note": "",
+    "safety_factor": 1.5
+  },
+  "stages": [
+    {
+      "id": "bp-rounds",
+      "command": "iterations",
+      "options": {}
+    }
+  ]
+}

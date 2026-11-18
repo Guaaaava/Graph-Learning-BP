@@ -1,0 +1,373 @@
+{
+  "schema_version": "gib4cl.paper-review.v1",
+  "review_date": "2026-11-05",
+  "registered_sha256": "03e3b31ae08fef1c050c35c63b00c34cc5e11a2f53645ac11140d85186a96266",
+  "current_sha256": "08247dd1637f814bf251d71131d43817d9bde697cb9fbbe6c110cbf059268d5d",
+  "snapshot_evidence": {
+    "initial": {
+      "path": "legacy/snapshots/2026-10-22/source-snapshot.zip",
+      "sha256": "04f319b1e925d025dd677ae2acf04ec260ee6242515c5a4735779d6f20d6a492"
+    },
+    "pre_layout": {
+      "path": "legacy/snapshots/2026-10-23-pre-layout/source-snapshot.zip",
+      "sha256": "69c512271b67ce056d2fd10925e6d6396f5115cadb3e70de615841e2e20f29df"
+    }
+  },
+  "difference_scope": "chapter_2_only",
+  "old_equation_environment_count": 47,
+  "current_equation_environment_count": 46,
+  "removed_equation_labels": [
+    "eq:distance_noise_model"
+  ],
+  "remaining_equation_bodies_and_labels_unchanged": true,
+  "chapters_3_4_byte_equivalent_after_text_decode": true,
+  "chapters_3_4_text_sha256": "86faaeb0222000448b165b265c3be03d9eab9f4aed358c547c1e30650e208679",
+  "current_equation_inventory": [
+    {
+      "labels": [
+        "eq:measurement_model"
+      ],
+      "sha256": "6619e442d2d4c98ae542d2b144959f30295ea26dcb69b02784f85657921bca22",
+      "line": 26
+    },
+    {
+      "labels": [
+        "eq:posterior_factorization"
+      ],
+      "sha256": "be88961ea1c11196e0d4895c468633650d32a93ef4eaba17dc24ad66c9da763d",
+      "line": 42
+    },
+    {
+      "labels": [
+        "eq:measurement_factor"
+      ],
+      "sha256": "97c3fd022a82f325031ac84bed388f042a0a317941f590a2d5b500f404417209",
+      "line": 58
+    },
+    {
+      "labels": [
+        "eq:bp_variable_to_factor"
+      ],
+      "sha256": "2f3c5d35dbd8ef2ba2d1115541f034bd56fc40aea3b3c3b5f0e913010eb10131",
+      "line": 75
+    },
+    {
+      "labels": [
+        "eq:bp_factor_to_variable"
+      ],
+      "sha256": "6b9d82535fd33dabffb68729009c5ed71f019fe5f2be32e93cb07a97ad0d6469",
+      "line": 86
+    },
+    {
+      "labels": [
+        "eq:bp_anchor_message"
+      ],
+      "sha256": "816af23d7507b7b50d7164c6b66ab7c83ccc8514beb837c85b4c54be3ef4546c",
+      "line": 96
+    },
+    {
+      "labels": [
+        "eq:bp_belief"
+      ],
+      "sha256": "28bf25eb46955f5628eceb4404956c0bdfe8102290ac03845ae792386ca6e303",
+      "line": 104
+    },
+    {
+      "labels": [
+        "eq:bp_mean"
+      ],
+      "sha256": "a5c78a6a99a4ccdec386c8366f62b8bbd0565302992acec1853e96f79b2d1f5a",
+      "line": 113
+    },
+    {
+      "labels": [
+        "eq:bp_covariance"
+      ],
+      "sha256": "3e4fcaa5dd98fcdb4660d0d55b81805be16668249ac57564c82ba394129b5374",
+      "line": 123
+    },
+    {
+      "labels": [
+        "eq:exact_cavity_marginal"
+      ],
+      "sha256": "3e7b3cb3d9b7cfc487ead605a6a4eb81fc585d6df51b20bd27d8cbd0d2bd57f2",
+      "line": 198
+    },
+    {
+      "labels": [
+        "eq:tree_branch_factorization"
+      ],
+      "sha256": "5f0f978cc9dc1c07af02afe6a8b0f0b4af3030fcb12c386a1b85838567067742",
+      "line": 210
+    },
+    {
+      "labels": [
+        "eq:tree_exact_bp_marginal"
+      ],
+      "sha256": "6a8f9beef3ce9603e88ef136e9750144d93b38bf79d846e3d4f2c83e0790778a",
+      "line": 217
+    },
+    {
+      "labels": [
+        "eq:directional_overconfidence"
+      ],
+      "sha256": "431b0c67c767acc88aad740b34872a59e016c05500a16498c9120d9ef6c69350",
+      "line": 239
+    },
+    {
+      "labels": [],
+      "sha256": "6a914a73a71cf27872e7cb840e3ecca56c017e542bd34fed396410c7c1cb939b",
+      "line": 257
+    },
+    {
+      "labels": [
+        "eq:fim_affine_decomposition"
+      ],
+      "sha256": "d996eb09b8b96c4b3cf396e950c8d91e44f060deb775ca8cc364ef7f5a0c0c6b",
+      "line": 276
+    },
+    {
+      "labels": [
+        "eq:GIB_objective"
+      ],
+      "sha256": "5f0a7f2b5e430b2a200dd3efffd9d5f7062321a84bcab3cecb72396bda23d114",
+      "line": 328
+    },
+    {
+      "labels": [
+        "eq:task_kl_identity"
+      ],
+      "sha256": "875952508382102cd85e8cfb2fd66fd0ff887628dc7329039d6852b45340b8d5",
+      "line": 341
+    },
+    {
+      "labels": [
+        "eq:task_information_bound"
+      ],
+      "sha256": "bb324d60b9d98e976b74ecac16974695f74b68f246c3e2e6ed6d94a0d04c0146",
+      "line": 357
+    },
+    {
+      "labels": [
+        "eq:task_nll"
+      ],
+      "sha256": "469383a2bdc2222dd39acdacbe0c6c1ce2780e345b450a48758665d14109ed16",
+      "line": 366
+    },
+    {
+      "labels": [
+        "eq:local_prediction_product"
+      ],
+      "sha256": "5b1e3f6d966ab1e7a5b26068df0fc6fc8196ca40aa183bdf19fcd0f3c08eb2cd",
+      "line": 450
+    },
+    {
+      "labels": [
+        "eq:prediction_precision"
+      ],
+      "sha256": "cae378103cd09b28220a025b211037cced5c5b924bc0b1a1b57c40fffd41e55a",
+      "line": 483
+    },
+    {
+      "labels": [
+        "eq:prediction_update"
+      ],
+      "sha256": "0eef5b9a201729453f36dacbfc123882efa6f607f7688a6fede58fc6ceb52a8c",
+      "line": 502
+    },
+    {
+      "labels": [
+        "eq:prediction_distribution"
+      ],
+      "sha256": "0c82f6227ab8640e70c02e09f4d9e1ef375b4dc9556275d89f05be404a5aea91",
+      "line": 530
+    },
+    {
+      "labels": [
+        "eq:linear_task_loss"
+      ],
+      "sha256": "986f63098f9dafab25b330c727444a1fd8de1c3469675f28c886f5fb865c9988",
+      "line": 548
+    },
+    {
+      "labels": [
+        "eq:graph_energy"
+      ],
+      "sha256": "f35dd4c8d1c4284487a870dcd6900df074c612d01e512e7a69027348ab2d995b",
+      "line": 569
+    },
+    {
+      "labels": [
+        "eq:triangle_count"
+      ],
+      "sha256": "e3bf7db75643916444c1569d7a37bf1ce2ee8cde2bbd825613ed223b82b72cfd",
+      "line": 587
+    },
+    {
+      "labels": [
+        "eq:max_entropy_formulation"
+      ],
+      "sha256": "b96d44c11c044dcfb9ec3b3ed5b7e8b255244e576d1ef3462d810a28b048be8b",
+      "line": 597
+    },
+    {
+      "labels": [
+        "eq:structured_prior"
+      ],
+      "sha256": "111445ea33afc2ce41f08e63b6aa52e782d724974e9ac2d81efcbc588494c44f",
+      "line": 627
+    },
+    {
+      "labels": [
+        "eq:data_reference"
+      ],
+      "sha256": "bb8d06c264ac90bc984515d44c6b791fa6d408473f35be7b5f7f2ba9f1416410",
+      "line": 650
+    },
+    {
+      "labels": [
+        "eq:complete_reference"
+      ],
+      "sha256": "c345819f58abc291dc850097ea9cfe0c54a7baa45e41061669084824902e99ea",
+      "line": 660
+    },
+    {
+      "labels": [
+        "eq:compression_kl_identity"
+      ],
+      "sha256": "d3cecdf805fcf18e0fd9e20c443412a470bdf2dfa09f06d63d73bf1646755832",
+      "line": 682
+    },
+    {
+      "labels": [
+        "eq:variational_bound"
+      ],
+      "sha256": "a282eca7a2c3027b0bc96d155fed40ac0171b137592c3c97f0b086d35369c976",
+      "line": 696
+    },
+    {
+      "labels": [
+        "eq:p_factorized"
+      ],
+      "sha256": "8b8d8d551b2c1b8efcb7d61694228d7a6081297755053cd6f334f2ad2eaf1fa9",
+      "line": 703
+    },
+    {
+      "labels": [
+        "eq:entropy_of_p_theta"
+      ],
+      "sha256": "2a801f5707f12e0036157c7b0476905a83d6a23095a3aca70d868f8fb1f2df3d",
+      "line": 713
+    },
+    {
+      "labels": [
+        "eq:expected_energy"
+      ],
+      "sha256": "5a5c4551e5b2d9e0b5cb824cedb816d6297767b40fd51498d149b445b8b11da2",
+      "line": 724
+    },
+    {
+      "labels": [
+        "eq:expected_triangle"
+      ],
+      "sha256": "316ba5505bc7789f92cba441d4c6b82b0bffd48184599bdef4505676217a9402",
+      "line": 730
+    },
+    {
+      "labels": [
+        "eq:full_kl"
+      ],
+      "sha256": "bc3842918ddaf5fa115591c34f4428ae14bde94ba4436528f19037de7b852ea2",
+      "line": 740
+    },
+    {
+      "labels": [
+        "eq:compression_loss"
+      ],
+      "sha256": "488a8c6b7a6516341cc8507a2908e5f73e934daff9c5c53c7c1cdaf2e384416e",
+      "line": 758
+    },
+    {
+      "labels": [
+        "eq:gib_training_bound"
+      ],
+      "sha256": "3c92110fa6b2fff4ff5723e9d0569c072b87c58548dd8bd8ef5dc038054ce4a1",
+      "line": 786
+    },
+    {
+      "labels": [
+        "eq:gib_train_objective"
+      ],
+      "sha256": "cce08275aeeca9194d5ea128c37526af804f5303361f73c62952d5862c0a0105",
+      "line": 795
+    },
+    {
+      "labels": [
+        "eq:message_passing",
+        "eq:node_update"
+      ],
+      "sha256": "bedd86254dae5cb30cbf2e758e946b95af9a4c87e4103ae4865f5f2f5a778740",
+      "line": 829
+    },
+    {
+      "labels": [
+        "eq:continuous_relaxation"
+      ],
+      "sha256": "62ea68511496ad48a0c4ada74bbc9fea835b333fbb1a8d1554fae6ae9f489353",
+      "line": 878
+    },
+    {
+      "labels": [
+        "eq:forward_hard"
+      ],
+      "sha256": "6b0119fc4fe636ac5c02e36650440d5171a473c0223f508972519836638dfc21",
+      "line": 887
+    },
+    {
+      "labels": [
+        "eq:backward_ste"
+      ],
+      "sha256": "d7e4532efbef0564f67c53ff7fa1f0111398fb6c0480c75f89d8fdb3393a4906",
+      "line": 892
+    },
+    {
+      "labels": [
+        "eq:degree_loss"
+      ],
+      "sha256": "42917edf8d1a0b2e6b4257559aa8ad57f24c47852bf0b8fe16f85cec7de3ddc9",
+      "line": 912
+    },
+    {
+      "labels": [
+        "eq:total_loss"
+      ],
+      "sha256": "88a0fb6a562b3a65d7b9ffa424ebcd304f5cac5c2b5727db2f20db177a5c79a2",
+      "line": 931
+    }
+  ],
+  "review_findings": [
+    {
+      "change": "remove blue revision wrappers and add section labels",
+      "effect": "editorial; no algorithm change"
+    },
+    {
+      "change": "remove sigma=sigma0+alpha*d; explicitly state positive standard deviation and independent edge noise",
+      "effect": "distance-dependent noise remains an explicitly declared experiment assumption, not a requirement of the current manuscript"
+    },
+    {
+      "change": "condense chapter-2 discussion of directional overconfidence and agent short cycles",
+      "effect": "keep numerical limitations; triangle count does not guarantee calibrated BP covariance"
+    },
+    {
+      "change": "reframe subgraph-selection section and add GNN/GIB/BP overview",
+      "effect": "matches existing pipeline; degree penalty encourages retention but is not a hard connectivity or rigidity constraint"
+    }
+  ],
+  "code_decision": "no changes to data generator, BP, model, objective or training algorithm required by this revision",
+  "preserved_core_sha256": {
+    "gib4cl/inference/particle_bp.py": "ac1ebac636de726f2d0e74a8b7b474fe83ad1e7e7e84f66c3862be78e6ce32d5",
+    "gib4cl/learning/model.py": "96f247f8a411e2b10e2b7ba72052229de321e7a2b1efacb0fa32c7359063b6a7",
+    "gib4cl/learning/objectives.py": "8cecf67745ef423198db2582144555b72ab097da007fb02fb23fcffe0611d1e2"
+  },
+  "review_report": "docs/paper-version-review-20261105.md"
+}

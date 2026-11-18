@@ -1,0 +1,17 @@
+{
+  "purpose": "smoke",
+  "conditions": [
+    {"name": "corridor", "centers": [[0, 0], [10, 1], [20, 0]], "cases": 4},
+    {"name": "equilateral", "centers": [[0, 0], [10, 17.32050807568877], [20, 0]], "cases": 4}
+  ],
+  "num_particles": 64,
+  "particle_grid": [32, 64, 128],
+  "repeats": 2,
+  "iterations": 30,
+  "chunk_size": 128,
+  "bootstrap_samples": 200,
+  "pilot_cases": 2,
+  "continuous_cases": 1,
+  "quadrature_orders": [9, 13, 17, 25, 33],
+  "max_reference_particles": 2048
+}

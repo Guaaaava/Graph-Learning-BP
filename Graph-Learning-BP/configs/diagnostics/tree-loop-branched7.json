@@ -1,0 +1,30 @@
+{
+  "purpose": "study",
+  "conditions": [
+    {"name": "corridor7", "graph_family": "branched7", "centers": [[0,0],[-10,0],[10,0],[-20,1],[-10,-10],[20,1],[10,-10]], "cases": 100, "range_std": 0.5, "prior_std": 1.0},
+    {"name": "spread7", "graph_family": "branched7", "centers": [[0,0],[-10,10],[10,10],[-20,0],[-20,20],[20,0],[20,20]], "cases": 100, "range_std": 0.5, "prior_std": 1.0}
+  ],
+  "topologies": ["tree", "loop3", "loop4", "loop5"],
+  "primary_loop": "loop5",
+  "num_particles": 128,
+  "particle_grid": [64, 128, 256],
+  "repeats": 3,
+  "iterations": 60,
+  "chunk_size": 256,
+  "message_tolerance": 1e-8,
+  "damping": 0.0,
+  "data_seed": 1030,
+  "particle_seed": 730,
+  "bootstrap_seed": 1730,
+  "bootstrap_samples": 2000,
+  "coverage_levels": [0.5, 0.8, 0.9, 0.95, 0.99],
+  "pilot_cases": 10,
+  "continuous_cases": 3,
+  "quadrature_orders": [9, 13, 17, 25, 33, 41],
+  "quadrature_tolerance": 0.01,
+  "particle_ratio_tolerance": 0.02,
+  "max_reference_particles": 2048,
+  "tree_tolerance": 1e-8,
+  "plot_rounds": 15,
+  "threads": 1
+}

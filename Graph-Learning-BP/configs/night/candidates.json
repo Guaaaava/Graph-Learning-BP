@@ -1,0 +1,60 @@
+{
+  "schema": "gib4cl.night-batch.v1",
+  "name": "formal-candidate-stages",
+  "config": "configs/experiment.json",
+  "protocol": "configs/selection/protocol.json",
+  "device": "cuda",
+  "threads": 1,
+  "budget": {
+    "max_seconds": 7200,
+    "max_units": 20,
+    "epochs_per_slice": 1,
+    "unit_estimate_seconds": null,
+    "estimate_note": "",
+    "safety_factor": 1.5
+  },
+  "stages": [
+    {
+      "id": "A",
+      "command": "candidates",
+      "options": {
+        "stage": "A"
+      }
+    },
+    {
+      "id": "B",
+      "command": "candidates",
+      "options": {
+        "stage": "B"
+      }
+    },
+    {
+      "id": "C",
+      "command": "candidates",
+      "options": {
+        "stage": "C"
+      }
+    },
+    {
+      "id": "D",
+      "command": "candidates",
+      "options": {
+        "stage": "D"
+      }
+    },
+    {
+      "id": "promote",
+      "command": "candidates",
+      "options": {
+        "stage": "promote"
+      }
+    },
+    {
+      "id": "final",
+      "command": "candidates",
+      "options": {
+        "stage": "final"
+      }
+    }
+  ]
+}

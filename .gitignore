@@ -1,0 +1,28 @@
+# Environments, generated artifacts and local editor state
+.venv*/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.vscode/
+.idea/
+data/
+outputs/
+dist/
+*.pt
+*.pth
+*.npz
+*.npy
+*.log
+*.pid
+*.lock
+
+# Local credentials and machine configuration
+.env
+.env.*
+!.env.example
+.ssh/
+*known_hosts*
+.DS_Store
+Thumbs.db

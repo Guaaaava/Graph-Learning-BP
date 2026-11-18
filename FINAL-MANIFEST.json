@@ -1,0 +1,612 @@
+{
+  "date": "2026-11-18",
+  "scope": "Prepared source checkout; excludes this manifest and generated directories",
+  "files": {
+    ".gitattributes": {
+      "bytes": 205,
+      "sha256": "4bf955413c3c5229194ac43064435aa5eca18815cabf3b435e216acacb0058ea"
+    },
+    ".gitignore": {
+      "bytes": 323,
+      "sha256": "028f6d849d94174f3bfcdc42babde0fdd1dddc27fee691995262b1d1a9eddf9d"
+    },
+    "DELIVERY-CHECK.md": {
+      "bytes": 2651,
+      "sha256": "2393a1e8473511ca4e9a6e5d60aae0b80f4638c5b56620aae588231eef19d04d"
+    },
+    "experiment-reference/center_bfs_tree.py": {
+      "bytes": 11240,
+      "sha256": "ee1c47962b8475015e71c33eac5041a2929e6a4729384ee6f16b3efa8edea0bd"
+    },
+    "experiment-reference/forest_baselines.py": {
+      "bytes": 13081,
+      "sha256": "552894b94b15a35920af2d550f3c2b42995f5aa8d4a77c10d4ce62e051488ca2"
+    },
+    "experiment-reference/formal_test.py": {
+      "bytes": 11903,
+      "sha256": "a0256301df36c0615ca39e2b93f722f75d42375168be8d6f4bb04700f7573c94"
+    },
+    "experiment-reference/README.md": {
+      "bytes": 711,
+      "sha256": "188746147fd50662e99bfb6ed696baa2f904fa88a7635c0a6d438562f53c7967"
+    },
+    "GIB-Chap234-1110.tex": {
+      "bytes": 63553,
+      "sha256": "fca465a1bdbcecf6adaa7b6e3594d44c0e039e1abb2bf604dba13304a0096771"
+    },
+    "Graph-Learning-BP/.gitattributes": {
+      "bytes": 424,
+      "sha256": "ce142e5f6224edd2daaa242aeb3403542beb74d6654f06577805ca3a83295033"
+    },
+    "Graph-Learning-BP/.gitignore": {
+      "bytes": 181,
+      "sha256": "e6dc10c001c612efe7ee5fae1f9a5664c580a5adcd010ba0fd76d005c11194db"
+    },
+    "Graph-Learning-BP/configs/diagnostics/tree-loop-branched7.json": {
+      "bytes": 1048,
+      "sha256": "537d99fc9e1a46968a513f605d483fe2717366931a495fb61456821c227dbbb3"
+    },
+    "Graph-Learning-BP/configs/diagnostics/tree-loop-fig1.json": {
+      "bytes": 1299,
+      "sha256": "d0b3ae4fcf342e6543b35affd11a969ecdc9648e6b295aed2c0d200d920e4e3b"
+    },
+    "Graph-Learning-BP/configs/diagnostics/tree-loop-smoke.json": {
+      "bytes": 486,
+      "sha256": "27b44a5ba18ad5136c231f87b852f09f89b311d6dab80b9204565ce2c7c35314"
+    },
+    "Graph-Learning-BP/configs/diagnostics/tree-loop.json": {
+      "bytes": 884,
+      "sha256": "fa5df3a5ae9f8ec0fe89ef47c73f357a0fc97174b26b89c127f911d52519f8bd"
+    },
+    "Graph-Learning-BP/configs/experiment.json": {
+      "bytes": 1749,
+      "sha256": "b4c056588c54d01df2abb4913d435424c83ebbb3b11fe656e136cad25e6dc20c"
+    },
+    "Graph-Learning-BP/configs/night/candidates.json": {
+      "bytes": 1070,
+      "sha256": "917c89c59680127344e452888120ca7d9986a51b10ffa81a85bc60711434d16e"
+    },
+    "Graph-Learning-BP/configs/night/iterations-first.json": {
+      "bytes": 489,
+      "sha256": "1ee05ebba3f0c7b0ce1cd5a5340f57cb86c9384dac366dac7acc496b23be9b69"
+    },
+    "Graph-Learning-BP/configs/night/smoke.json": {
+      "bytes": 695,
+      "sha256": "9a151b931e9753218e579b76a5b4d7eb71439d75182f9587f2f1a51f4ede909a"
+    },
+    "Graph-Learning-BP/configs/selection/protocol.json": {
+      "bytes": 11731,
+      "sha256": "d0155bd01344ae1418a721070fa551c4213b7b278597b0e68ccad14d4bce6f79"
+    },
+    "Graph-Learning-BP/configs/selection/smoke-protocol.json": {
+      "bytes": 11113,
+      "sha256": "f5ffad98ce29896b16185ca2d718d4ad12580db5174570363ee1cae3d00a996c"
+    },
+    "Graph-Learning-BP/configs/smoke-pipeline.json": {
+      "bytes": 1666,
+      "sha256": "7bb8b3433c321624c53efcff4659cada6189da4456e3440a9b60cc47e2f8bac1"
+    },
+    "Graph-Learning-BP/configs/suites/smoke-seeds.json": {
+      "bytes": 231,
+      "sha256": "2f64e9d115751d6ce6ceff082c4df8c7fad375cdd1268c408b6f510c4de05e0b"
+    },
+    "Graph-Learning-BP/docs/acceptance.md": {
+      "bytes": 5778,
+      "sha256": "accf1acd6267afd2ff23b20616650bc1845e89c664c27293553abd9442843d5c"
+    },
+    "Graph-Learning-BP/docs/bp-performance.md": {
+      "bytes": 6090,
+      "sha256": "ad57d690f73466aea2a81cc20b1caa1e7f9b27d738a0380d8b5e466b00054b4e"
+    },
+    "Graph-Learning-BP/docs/bp-stage-a.md": {
+      "bytes": 5667,
+      "sha256": "5d32538d341a298d0699534c903da0a1865043b09419508773ed46bd9c351d54"
+    },
+    "Graph-Learning-BP/docs/data-contract.md": {
+      "bytes": 5969,
+      "sha256": "733c0c367ceed0fc5bf6695653d75432354dfb30bfc30032d63549f57f0ba20f"
+    },
+    "Graph-Learning-BP/docs/delivery-and-seeds.md": {
+      "bytes": 3969,
+      "sha256": "0d128a10b4cee9f4b59d7a86b7ddf72f9134785f5f920af1b1b304542f0bd832"
+    },
+    "Graph-Learning-BP/docs/evaluation-metrics.md": {
+      "bytes": 13022,
+      "sha256": "33f76725870c3c31859c09ade1850e27fabfb7e1326693494c317d0ca21ca17d"
+    },
+    "Graph-Learning-BP/docs/experiment-selection.md": {
+      "bytes": 7169,
+      "sha256": "a775fa35af5bacf5e03b40738202e5907f9271c4b3b1dc3df4d7f48369a948a0"
+    },
+    "Graph-Learning-BP/docs/gnn-sampling.md": {
+      "bytes": 6456,
+      "sha256": "ccb7aa2c2e12534b984227e49a25f521c03ab44c7eaefe6187be2c0b035d49a8"
+    },
+    "Graph-Learning-BP/docs/implementation-decisions.md": {
+      "bytes": 2606,
+      "sha256": "4f8d7cca407e41d3ec84f1ca6523fbfce1b4efb0d7da8d6d77676691dbfeb2e0"
+    },
+    "Graph-Learning-BP/docs/local-module-tests.md": {
+      "bytes": 2575,
+      "sha256": "4704dd02800d4feec33f9e9f24a4c6bb97db13b25e744035fce2b49f405c2687"
+    },
+    "Graph-Learning-BP/docs/night-running.md": {
+      "bytes": 8919,
+      "sha256": "9e8ed6ec2835442795644bcdd2021e22319fffbebd4580513ba474f81af26420"
+    },
+    "Graph-Learning-BP/docs/paper-implementation-map.md": {
+      "bytes": 7998,
+      "sha256": "cf704c9353ffece616bf6a3e9a7ac09740df24531bcbdd149454f652a6b1aedf"
+    },
+    "Graph-Learning-BP/docs/paper-version-review-20261105.json": {
+      "bytes": 10810,
+      "sha256": "65aac83ef9a03c09f95753939de40cea8e66141bfce93780527eaf61454861a6"
+    },
+    "Graph-Learning-BP/docs/paper-version-review-20261105.md": {
+      "bytes": 3668,
+      "sha256": "8e3ee4b4e5d639c1c999097e9ddfa79de379909c532ccd3de66938f0a59254a8"
+    },
+    "Graph-Learning-BP/docs/parameter-basis.md": {
+      "bytes": 10828,
+      "sha256": "881b6c27505bb6daeaa491f19aa38156e824f1746a8570ea9bea74cf8c60959b"
+    },
+    "Graph-Learning-BP/docs/particle-bp.md": {
+      "bytes": 11341,
+      "sha256": "6081aa9e0ba1351a8aa90a4dabc366be43d78bb0173c40c747956ef9002b671f"
+    },
+    "Graph-Learning-BP/docs/pre-tuning-readiness.md": {
+      "bytes": 5960,
+      "sha256": "2acdcbdb115e46d7abd42a330a2e6b91411b9006e9056606738ba57fae8a3323"
+    },
+    "Graph-Learning-BP/docs/provenance.md": {
+      "bytes": 3852,
+      "sha256": "bfda715c23a82ba028839148e7368d777e6d6210e912e82c7bec86b62d1cd50b"
+    },
+    "Graph-Learning-BP/docs/selection-execution.md": {
+      "bytes": 10427,
+      "sha256": "7439f536f3c124e1593672e464cd96754f647ed8fb1eaa89ef660e9854bab2f1"
+    },
+    "Graph-Learning-BP/docs/selection-protocol.md": {
+      "bytes": 15121,
+      "sha256": "fdf79eaab1979ca1096ad319203e7cfa6e6e996b733ca53721d6ced865f11725"
+    },
+    "Graph-Learning-BP/docs/source-layout.json": {
+      "bytes": 1704,
+      "sha256": "c64f12aef9ac72de02810ab07177292c007a147b754a7ed00a07a89c4f6f1cde"
+    },
+    "Graph-Learning-BP/docs/TODO.md": {
+      "bytes": 8318,
+      "sha256": "d693398528f6487030a76baec407e419e6e918b3bfb43fb7f12a22c06d710ca7"
+    },
+    "Graph-Learning-BP/docs/training-diagnostics.md": {
+      "bytes": 6698,
+      "sha256": "06b2cad6ee9711eeb13d3f16895a9c65df67c804698c4716537643f9ea0061e0"
+    },
+    "Graph-Learning-BP/docs/training-objective.md": {
+      "bytes": 8173,
+      "sha256": "878f9ed80f3d4da59075bf52e1c77fd653ceefe1ccb7da9bce7a2764613b30f2"
+    },
+    "Graph-Learning-BP/docs/tree-loop-experiment.md": {
+      "bytes": 10143,
+      "sha256": "33673ae923b789500091125b984197910ecd869762653b39170bcfd0dd4d3cde"
+    },
+    "Graph-Learning-BP/docs/tree-loop-extensions.md": {
+      "bytes": 6413,
+      "sha256": "8a5d7bbb9b79909604a2de9892cb1ec7e1bf188202a46952089eba997af3c658"
+    },
+    "Graph-Learning-BP/docs/tree-loop-overconfidence-plan.md": {
+      "bytes": 22987,
+      "sha256": "7398ccc0ad4ea36333fd68de3d57625ef7e54ef8e154ade6c619637fc98f4a1c"
+    },
+    "Graph-Learning-BP/docs/tree-loop-paper-selection.md": {
+      "bytes": 4001,
+      "sha256": "fc7fd37eec54341f00113d6c1a604369865db3de5bb62dfaa12f4f895fe03bf9"
+    },
+    "Graph-Learning-BP/docs/tree-loop-reader-guide.md": {
+      "bytes": 8174,
+      "sha256": "d756039a1c06cc3c0359e4175fc2fca34f761366a8a9804a04351da88ccce479"
+    },
+    "Graph-Learning-BP/docs/unified-experiment.md": {
+      "bytes": 2834,
+      "sha256": "29073f7e9fcfe1efe46ff157bfab66a73f3d5e65a43f35761522ad7220185558"
+    },
+    "Graph-Learning-BP/docs/validation-selection.md": {
+      "bytes": 5767,
+      "sha256": "58bdabd1807e25e28bce4998478b44f95c5399b899342573af6baeb450d3b251"
+    },
+    "Graph-Learning-BP/gib4cl/__init__.py": {
+      "bytes": 94,
+      "sha256": "19ab8f7143d8fe6a3de11763e6f40587d08d4c5666bbbffa54beed1391d1346c"
+    },
+    "Graph-Learning-BP/gib4cl/__main__.py": {
+      "bytes": 141,
+      "sha256": "28c318cabf4cbf937f02489193ffef159df2f5865898c50b333eb6085a7c5165"
+    },
+    "Graph-Learning-BP/gib4cl/config.py": {
+      "bytes": 18001,
+      "sha256": "6bf4b5f32c63e4632a6d8c7e86425d2c0a37d1244882f91e862e5526431b7387"
+    },
+    "Graph-Learning-BP/gib4cl/data/__init__.py": {
+      "bytes": 57,
+      "sha256": "2e77d1e9e3dd9c47f7264b2f50fd47974afec6447474a515f8b5348fdadb44f3"
+    },
+    "Graph-Learning-BP/gib4cl/data/dataset.py": {
+      "bytes": 3792,
+      "sha256": "e4a3fcb3306fe4d7d6bd092a7610d8836183f95fa6e65a29f97ecb0125510efe"
+    },
+    "Graph-Learning-BP/gib4cl/data/generate.py": {
+      "bytes": 7724,
+      "sha256": "3130b5bacf9df82b88a154544abc88a3a9ba701c8993123daeaef1a53581d557"
+    },
+    "Graph-Learning-BP/gib4cl/data/network.py": {
+      "bytes": 3452,
+      "sha256": "595edd1d26f510441127ebf5bbbcc71b03db5c36f81e9af47c3d306e11c61cd2"
+    },
+    "Graph-Learning-BP/gib4cl/data/schema.py": {
+      "bytes": 15251,
+      "sha256": "b9ba64fb12a972dfa9db6d8e685d2e51ac5b719c1999a5f61d5f07f33e19c38b"
+    },
+    "Graph-Learning-BP/gib4cl/evaluation/__init__.py": {
+      "bytes": 70,
+      "sha256": "79ac6dab011259ee8c796489a6dd7765c6de3a53277d614f8d1c0734b5f3b812"
+    },
+    "Graph-Learning-BP/gib4cl/evaluation/evaluate.py": {
+      "bytes": 17884,
+      "sha256": "9c5105f59666376ff7cca7d1f7fe8f5081fe88fae15865a97345ce84a0de05f6"
+    },
+    "Graph-Learning-BP/gib4cl/evaluation/metrics.py": {
+      "bytes": 21154,
+      "sha256": "0375eee9cae0e4d0b86c5750c3177a711f75dfa1b96f7cfd7163921b8ed4fabd"
+    },
+    "Graph-Learning-BP/gib4cl/evaluation/plotting.py": {
+      "bytes": 4402,
+      "sha256": "05ba89ef2cc326ea674ee2b063109a5080f5081e3f1d65bc400fe37c092fd424"
+    },
+    "Graph-Learning-BP/gib4cl/evaluation/topology.py": {
+      "bytes": 4564,
+      "sha256": "53c05700fd956222a55878575cb122709b2b41693ca4203c7eeb0ff274e1fc37"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/__init__.py": {
+      "bytes": 58,
+      "sha256": "3af44ba3598a666c3f261c85b0e727d15e018f1f68f04c9833e8a749c2150f47"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/cli.py": {
+      "bytes": 7348,
+      "sha256": "888da7ed616b764628651390de0bb1cdef856fa181e61d691e321960f4937fd8"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/suite.py": {
+      "bytes": 22065,
+      "sha256": "2f912647ee9df0004cd278010c8cd163fd2deca01f75633628b1b37c5d06d172"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/tree_loop/__init__.py": {
+      "bytes": 75,
+      "sha256": "aa6629377c421b904eb5d56e211589337c627fadb89feed8a45de49ae97d6f26"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/tree_loop/__main__.py": {
+      "bytes": 1911,
+      "sha256": "0533c6bf1378d43ac49fd99b9e2f8cc87aad4e17b19709f6054bed7b134b0aa9"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/tree_loop/calibration.py": {
+      "bytes": 3573,
+      "sha256": "69165c5a9d9b08b58baf063befdd9d6a9bd4f08ddd44aa75e5a974956e25f523"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/tree_loop/config.py": {
+      "bytes": 6597,
+      "sha256": "a49ba2cb4d136d1adb2170de65bfc30df451315a60b9081290ab2093fa9c354a"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/tree_loop/experiment.py": {
+      "bytes": 23274,
+      "sha256": "7663c8edbb1403619fddf73012b12fceffa93123ac3c465faa201e854b27a379"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/tree_loop/figures.py": {
+      "bytes": 22548,
+      "sha256": "837034f22eea7c4c5be71ec126690c3b1c40692a70103140a6284d38805f40ba"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/tree_loop/gaussian_control.py": {
+      "bytes": 2447,
+      "sha256": "8a078a24f5ec5c5d1c62881bc00fcc288ec1333a33534f679f9dd9af04b3a8c5"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/tree_loop/metrics.py": {
+      "bytes": 13619,
+      "sha256": "59453f4bc0060c327427fa03b3d8bed043018cc54e9ca2fb35ba8e1cf665e9f4"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/tree_loop/model.py": {
+      "bytes": 3651,
+      "sha256": "3597eb9832d1dc06e54ae20cacf45ff54a1b478be59975d5027f9485f3ab712e"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/tree_loop/plotting.py": {
+      "bytes": 140,
+      "sha256": "e0ae90ce8816ca2af0d2030b6009a967555671e543b50395d6dcc7bd70ec91f5"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/tree_loop/reference.py": {
+      "bytes": 12841,
+      "sha256": "68957406c7a601547c89789582aac64a1be77159f5be2a505c48b23e0168b3ae"
+    },
+    "Graph-Learning-BP/gib4cl/experiments/worker.py": {
+      "bytes": 1436,
+      "sha256": "546d3f4cb13626463fb9b702803e47d46cc1c5965c960f779ba3689286528d57"
+    },
+    "Graph-Learning-BP/gib4cl/forest_merge.py": {
+      "bytes": 1416,
+      "sha256": "bf5a9495e15018ec8c35a47d6e84137bf703433f9b3344da1a2ca61224d4da05"
+    },
+    "Graph-Learning-BP/gib4cl/inference/__init__.py": {
+      "bytes": 152,
+      "sha256": "d4a7d77aaa0ea5771a6c070785edf1a9e15efde90d4b25ba624a672617c6cb63"
+    },
+    "Graph-Learning-BP/gib4cl/inference/particle_bp.py": {
+      "bytes": 20266,
+      "sha256": "ac1ebac636de726f2d0e74a8b7b474fe83ad1e7e7e84f66c3862be78e6ce32d5"
+    },
+    "Graph-Learning-BP/gib4cl/inference/spanning_tree.py": {
+      "bytes": 4718,
+      "sha256": "9246f951abdb615e55d626bf02fdf2de7e44df5a3e03af8da9fe8ff335916f26"
+    },
+    "Graph-Learning-BP/gib4cl/learning/__init__.py": {
+      "bytes": 77,
+      "sha256": "4ba323ac7d51a89aac377151828b2c7aa2dc951aae8ad8f21b9192b2d29db53b"
+    },
+    "Graph-Learning-BP/gib4cl/learning/checkpoints.py": {
+      "bytes": 5756,
+      "sha256": "06eeb5b365d55020cd5cc4ae25291fd4aa8703101c17124f48a52f1ef463e313"
+    },
+    "Graph-Learning-BP/gib4cl/learning/diagnostics.py": {
+      "bytes": 13112,
+      "sha256": "bf25624231a816c941a0ca15cca49cd8524199bc1f378aad0fdedfd6ad12b594"
+    },
+    "Graph-Learning-BP/gib4cl/learning/model.py": {
+      "bytes": 10740,
+      "sha256": "96f247f8a411e2b10e2b7ba72052229de321e7a2b1efacb0fa32c7359063b6a7"
+    },
+    "Graph-Learning-BP/gib4cl/learning/objectives.py": {
+      "bytes": 15275,
+      "sha256": "8cecf67745ef423198db2582144555b72ab097da007fb02fb23fcffe0611d1e2"
+    },
+    "Graph-Learning-BP/gib4cl/learning/train.py": {
+      "bytes": 15388,
+      "sha256": "3586cc9262345182dec9f3ce64fa1bb797226498a2988a53d2932598fcf1134d"
+    },
+    "Graph-Learning-BP/gib4cl/learning/validation.py": {
+      "bytes": 5325,
+      "sha256": "30097917fa30b464b18f4514fbd3163bd06bfa271834cf0d7c88557cd27b1b27"
+    },
+    "Graph-Learning-BP/gib4cl/runtime.py": {
+      "bytes": 6845,
+      "sha256": "b99b49ddf026ba74a0a48cc7beb3cd1f3d0140eeae7a9507dd6f282eaa3dd7bd"
+    },
+    "Graph-Learning-BP/pytest.ini": {
+      "bytes": 90,
+      "sha256": "9576eb24c92a4f2d2c66731b62c86bfcba23317dff6d2b63c30ec10bc75bd8c9"
+    },
+    "Graph-Learning-BP/README.md": {
+      "bytes": 5200,
+      "sha256": "5c9cd9645a6dc2e42f6521ae5fd262e882323e5bf1233937d1c28d36432b8bff"
+    },
+    "Graph-Learning-BP/requirements.txt": {
+      "bytes": 237,
+      "sha256": "f2600957766f0da2c48407d6f589bb962118ee64e886139e0e11a1ddb1d98e1c"
+    },
+    "Graph-Learning-BP/tests/__init__.py": {
+      "bytes": 75,
+      "sha256": "27a4bd5749e68e5d3115c26c84e0fdeec83f4f2e3df206d0f014fcf074ab79b5"
+    },
+    "Graph-Learning-BP/tests/audits/__init__.py": {
+      "bytes": 51,
+      "sha256": "42668f8d207e64857df97d35fdf260a23c2dce14b1f685fb772dc4a3d12d85a2"
+    },
+    "Graph-Learning-BP/tests/audits/checkpoints.py": {
+      "bytes": 7268,
+      "sha256": "e3a8388b078b7ea7a660beefd432f5a39c3c9e2d8e1551f742e1195fa1f4190d"
+    },
+    "Graph-Learning-BP/tests/audits/metrics.py": {
+      "bytes": 11859,
+      "sha256": "29caf932232b69c95656effa03b70afa55dec47252a320a0aa10a266d46ed708"
+    },
+    "Graph-Learning-BP/tests/fixtures/provenance.json": {
+      "bytes": 3994,
+      "sha256": "e23ae4627227573f7204f725cc9a3d36aa8e9df37939cd75b928d79030c0f355"
+    },
+    "Graph-Learning-BP/tests/references/__init__.py": {
+      "bytes": 74,
+      "sha256": "0d186aabaa58de1541e6ef139c06c05ad5b05340772afb2d6095d50d3c297b1e"
+    },
+    "Graph-Learning-BP/tests/references/particle_posterior.py": {
+      "bytes": 8102,
+      "sha256": "5cc6118cd1d589a39821484e9ab9087f3952c99bed1c0cacbc2377724cefeb87"
+    },
+    "Graph-Learning-BP/tests/test_bp_performance.py": {
+      "bytes": 11029,
+      "sha256": "046df980c7b83146a2050694e6245b9e23d50ad753dd7d1486e7fb5f19118e5a"
+    },
+    "Graph-Learning-BP/tests/test_bp_stage_a.py": {
+      "bytes": 12748,
+      "sha256": "f04275378cef362079489e5999f1c0a1ea67d722670317e8fe80df674cec417c"
+    },
+    "Graph-Learning-BP/tests/test_config.py": {
+      "bytes": 2675,
+      "sha256": "fb4b323ac48b9a883b34a37a807612ebc127e164b57106cccdece52b0e4b9880"
+    },
+    "Graph-Learning-BP/tests/test_data_contract.py": {
+      "bytes": 16751,
+      "sha256": "48681b6a29ec850f6012f75336964ab1a4601a6c458a5432d1d947b02499cf87"
+    },
+    "Graph-Learning-BP/tests/test_delivery.py": {
+      "bytes": 14168,
+      "sha256": "67b4c1da6a7514a99912d35c872b22830b64fe79e69feda2ad849060a885c99b"
+    },
+    "Graph-Learning-BP/tests/test_experiment_pipeline.py": {
+      "bytes": 20379,
+      "sha256": "505aea9433e15813ef59a2e98596d690e30bb9c1b6ed65544441f2a367fa7016"
+    },
+    "Graph-Learning-BP/tests/test_metrics.py": {
+      "bytes": 16306,
+      "sha256": "240febf5527f8b7c661afcc85c3e7def6ae0b4aae9f4aef5e31f6877729643e7"
+    },
+    "Graph-Learning-BP/tests/test_model_sampling.py": {
+      "bytes": 15631,
+      "sha256": "2cdf1acf63b2978edee2224eb5a5c71015aef4c6db35f8a84c149fd43c040a08"
+    },
+    "Graph-Learning-BP/tests/test_night_runner.py": {
+      "bytes": 16177,
+      "sha256": "b753aa15ad95094c9dfc7506af1265ab2637f6674e0660c698f25919e7dda4c3"
+    },
+    "Graph-Learning-BP/tests/test_objectives.py": {
+      "bytes": 20809,
+      "sha256": "5ad5278cc38df557f72b3b12834a0fd4d91a4e9d751d324abf56580dfc68a1da"
+    },
+    "Graph-Learning-BP/tests/test_paper_revision.py": {
+      "bytes": 2384,
+      "sha256": "a4129db8dcb0f423a8a315ab38c74572e23835b85b1615b553129e074f47cf2f"
+    },
+    "Graph-Learning-BP/tests/test_particle_bp.py": {
+      "bytes": 23022,
+      "sha256": "23dbb7dd57be751bca9e4e9123a77407af256105e3e86a84937794418cee2ccb"
+    },
+    "Graph-Learning-BP/tests/test_portable_supplements.py": {
+      "bytes": 2132,
+      "sha256": "cf8788cfccc541ed63cd652e5c03eedaab83f054522b6d1ecc8db0418ca8259f"
+    },
+    "Graph-Learning-BP/tests/test_provenance.py": {
+      "bytes": 2918,
+      "sha256": "e96c0b7e73f8321fa2fdd888cc45f15334349f219e336eddc3485ca0282e0c8a"
+    },
+    "Graph-Learning-BP/tests/test_runtime_paths.py": {
+      "bytes": 1238,
+      "sha256": "e315d51c2a18101e172ae86b8e17d227a547211e54f5a651d45c8a4b5a688c35"
+    },
+    "Graph-Learning-BP/tests/test_selection_diagnostics.py": {
+      "bytes": 5429,
+      "sha256": "c340e56f8bb94337ceb58187179131a07e214bdaa768b4612f39e1dc449d69a3"
+    },
+    "Graph-Learning-BP/tests/test_selection_runner.py": {
+      "bytes": 15214,
+      "sha256": "d7a2a89d556668e5420ecb322719e13b68e82954079142dfa9ea92c323060423"
+    },
+    "Graph-Learning-BP/tests/test_source_package.py": {
+      "bytes": 5558,
+      "sha256": "51ee13dddfb3601983fe0730bc999feca5be2c9030d3ac92fe162e250c08f6f3"
+    },
+    "Graph-Learning-BP/tests/test_training_diagnostics.py": {
+      "bytes": 9186,
+      "sha256": "9e2a9f5eb1fad698c37211c333a21479d15d18892e8b6de419d0a2a8361f46a5"
+    },
+    "Graph-Learning-BP/tests/test_tree_loop.py": {
+      "bytes": 10359,
+      "sha256": "d889ffecc82fecb29ca3c959cbb32f4405fe2b9a00c65cf034f788b44d76a0d8"
+    },
+    "Graph-Learning-BP/tests/test_tree_loop_extensions.py": {
+      "bytes": 10207,
+      "sha256": "836084af6e0d4e5bd6aac26d552b32412326b91ea25f5a718a3fd096367df410"
+    },
+    "Graph-Learning-BP/tests/test_validation_selection.py": {
+      "bytes": 8165,
+      "sha256": "0a3da325fd714391d24dd619f2a4a2c6df58149a6b76ba963d88456866d0230a"
+    },
+    "Graph-Learning-BP/tools/__init__.py": {
+      "bytes": 76,
+      "sha256": "ee34f3efa726f388acddc440feeb9862a56be4386c10a32c2cf75115d7c2da4f"
+    },
+    "Graph-Learning-BP/tools/accept_cpu.py": {
+      "bytes": 8204,
+      "sha256": "f13ae26fac79d882597583d298c62139a6d8c307073898de8e02ae35a81fbff7"
+    },
+    "Graph-Learning-BP/tools/baseline_topologies.py": {
+      "bytes": 2938,
+      "sha256": "61d7c9fc3be421b8191c1f89243557fce40fb64330444560e333c0ddecadb163"
+    },
+    "Graph-Learning-BP/tools/bp_benchmark.py": {
+      "bytes": 19355,
+      "sha256": "61ee202950cb57482a6f1f745399a2c1d767e0de2d3c7ca9eb192e66215d29d7"
+    },
+    "Graph-Learning-BP/tools/bp_cached.py": {
+      "bytes": 5984,
+      "sha256": "c5a0e0abc79879cd251e09864f10b56d52e8ecd23131d8dc84c2656146a618fc"
+    },
+    "Graph-Learning-BP/tools/bp_cached_fast.py": {
+      "bytes": 5936,
+      "sha256": "58ae8e10426bf4da4c2a204eaa7e41b53c7c74d5442aa392410767a688a17d6a"
+    },
+    "Graph-Learning-BP/tools/bp_cost.py": {
+      "bytes": 8716,
+      "sha256": "f279b8020f1fac8e21e26e3f0bf05d932f98d8c6a455dde0b2e97c522c69adf4"
+    },
+    "Graph-Learning-BP/tools/bp_distance.py": {
+      "bytes": 603,
+      "sha256": "52dbc310e843cc24ab44903b129ad886392ae18807cef039a7bffc8708044549"
+    },
+    "Graph-Learning-BP/tools/bp_joint_reference.py": {
+      "bytes": 10527,
+      "sha256": "2d74b80209d4b7febf0a81b7e7c3bec8edc5339b0d305c65470a7df27a3037c1"
+    },
+    "Graph-Learning-BP/tools/bp_sample_plan.py": {
+      "bytes": 6190,
+      "sha256": "0850467d500c6e0b4bfcf97cef04eff90053256e84dd12af49d53f97a14840fc"
+    },
+    "Graph-Learning-BP/tools/bp_stage_a.py": {
+      "bytes": 14215,
+      "sha256": "aff9217df00bc910b1233bec9709dc953544bf14538f1609a89148e0c260a072"
+    },
+    "Graph-Learning-BP/tools/bp_timing.py": {
+      "bytes": 8198,
+      "sha256": "3da9baef84c64c5b272be48c1fbb237833c44092872516787b99932910665f90"
+    },
+    "Graph-Learning-BP/tools/night_runner.py": {
+      "bytes": 33440,
+      "sha256": "e1b9310df55a2a2cc59a81ad858e62a2e89d827a9a29b15b244e41df4cb39e3e"
+    },
+    "Graph-Learning-BP/tools/package_project.py": {
+      "bytes": 9512,
+      "sha256": "4755e45abccbc8d36ed7048966c5d73a2e2296fe6d253dde7b5e6d60ff89eacd"
+    },
+    "Graph-Learning-BP/tools/preview_network.py": {
+      "bytes": 10141,
+      "sha256": "cf7e27de386da9eecd5414125fd40644c0c2ffbdddf4e4432679e623065f1968"
+    },
+    "Graph-Learning-BP/tools/provenance.py": {
+      "bytes": 8281,
+      "sha256": "901cf2831ca0ac4fb73450a4b7a324690f724c48f78a81a68f160dfe8f6203a9"
+    },
+    "Graph-Learning-BP/tools/selection_candidates.py": {
+      "bytes": 11574,
+      "sha256": "6c9b3791ffcbb3c565260d17e23268e37d7ba9299476c546b6f1ce515f4bca18"
+    },
+    "Graph-Learning-BP/tools/selection_compare.py": {
+      "bytes": 11538,
+      "sha256": "c582b699ffac2abaa871cfcd87d677899a8a5233060786ff0e86f5de47d7efcb"
+    },
+    "Graph-Learning-BP/tools/selection_diagnostics.py": {
+      "bytes": 21710,
+      "sha256": "ea89b7f9db4438c530030fd36cd8d0ed63cb5e0627818b768a7812f0d7110ad6"
+    },
+    "Graph-Learning-BP/tools/selection_evaluate.py": {
+      "bytes": 10521,
+      "sha256": "2318c5d18f27a19e5e67c9d5afcb1f1f01bd1bd38b50967485d8769f33c9a7a8"
+    },
+    "Graph-Learning-BP/tools/selection_iterations.py": {
+      "bytes": 10842,
+      "sha256": "b72cf68e258eae9793b50e027963211aa54682210dc53f2e563bad11e49e1c34"
+    },
+    "Graph-Learning-BP/tools/selection_runner.py": {
+      "bytes": 11238,
+      "sha256": "e02c4132811109cc7acfeb78188251fba39c7e51dd1451716706bd030e71f673"
+    },
+    "Graph-Learning-BP/tools/selection_state.py": {
+      "bytes": 7869,
+      "sha256": "7a5cb87e71cc671693ed341b3c270ef60b5a0ac46655c35abbe2ebf36e3c1a36"
+    },
+    "planning/固定噪声与4090实验计划.md": {
+      "bytes": 12209,
+      "sha256": "78b0dd0f1b044d719a499ad4d750f7dadaa9792e7b6e8120a62f6eb3db4800fa"
+    },
+    "README.md": {
+      "bytes": 3268,
+      "sha256": "c045015df7ac883fe9c5e12e00d426abe819fe4a6ca6d8e34a00e6f880721ddd"
+    },
+    "SOURCE-ORIGINS.json": {
+      "bytes": 33538,
+      "sha256": "dfbdff6bfbb11ecd14d7b2ff612c2f058cf1712827ebcb934d9de12dcbd5eddb"
+    }
+  },
+  "file_count": 151,
+  "total_bytes": 1253467
+}

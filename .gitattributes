@@ -1,0 +1,6 @@
+# Editable files retain LF on Windows and Linux.
+* text eol=lf
+
+# Preserve the registered manuscript and original runner snapshots byte for byte.
+GIB-Chap234-1110.tex -text
+experiment-reference/*.py -text

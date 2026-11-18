@@ -1,0 +1,1116 @@
+
+\section{System Model and Problem Formulation}
+\label{sec:system_formulation}
+This section defines the system model for cooperative localization, introduces the belief propagation (BP) algorithm, analyzes how cycles affect the uncertainty of localization estimated by BP, and formulates the corresponding graph topology optimization problem.
+
+
+\subsection{System Model}
+\label{sec:system_model}
+Consider a wireless cooperative localization network with $K_a$ anchors and $K_b$ agents. The anchors are pre-deployed within the area to be localized, and their positions are precisely known. In contrast, the positions of the agents are unknown and need to be estimated through inter-node measurements. The network is modeled as an undirected graph $\mathcal{G}=(\mathcal{V},\mathcal{E})$, where $\mathcal{V}$ and $\mathcal{E}$ denote the sets of localization nodes and the available communication edges, respectively. The vertex set $\mathcal{V}$ is partitioned as
+\[
+    \mathcal{V}=\mathcal{V}_a\cup\mathcal{V}_b,
+\]
+where $\mathcal{V}_a=\{1,\ldots,K_a\}$ is the set of anchors and $\mathcal{V}_b=\{K_a+1,\ldots,K_a+K_b\}$ is the set of agents. The coordinate of an anchor $i\in \mathcal{V}_a$ is denoted by $\mathbf{x}_i=[x_i,y_i]^T\in \mathbb{R}^2$ and is known, while the coordinate of an agent $i\in \mathcal{V}_b$ is denoted by $\mathbf{y}_i\in \mathbb{R}^2$ and need to be estimated collaboratively. The global coordinate vector of all agents is
+\[
+    Y=[\mathbf{y}_1^T,\mathbf{y}_2^T,\ldots,\mathbf{y}_{K_b}^T]^T\in \mathbb{R}^{2K_b},
+\]
+which is the target variable of the localization task.
+
+For a unified notation, let $\mathbf{r}_i$ denote the coordinate of node $i$, i.e.,
+\[
+    \mathbf{r}_i=
+    \begin{cases}
+        \mathbf{x}_i, & i\in\mathcal{V}_a,\\
+        \mathbf{y}_i, & i\in\mathcal{V}_b.
+    \end{cases}
+\]
+For each communication edge $(i,j)\in\mathcal{E}$, the range measurement $z_{ij}$ is modeled as
+\begin{equation}
+    z_{ij}=d_{ij}+n_{ij},
+    \qquad
+    d_{ij}=\|\mathbf{r}_i-\mathbf{r}_j\|_2,
+    \label{eq:measurement_model}
+\end{equation}
+where $n_{ij}\sim\mathcal{N}(0,\sigma_{ij}^2)$ is the range measurement noise, and $\sigma_{ij}>0$ is its standard deviation. Measurement noises are assumed to be independent across edges.
+
+\subsection{Belief Propagation for Cooperative Localization}
+\label{sec:bp_algorithm}
+Let
+\[
+    Z=
+    \{z_{ij}\mid(i,j)\in\mathcal{E}\}
+\]
+denote all available range measurements. Given a factor graph $\mathcal{G}$, cooperative localization can be formulated as Bayesian inference of the unknown agent coordinates. The posterior distribution can be factorized as
+\begin{equation}
+    p(Y\mid Z,\mathcal{G})
+    \propto
+    \prod_{i\in\mathcal{V}_b}
+    \psi_i(\mathbf{y}_i)
+    \prod_{(i,j)\in\mathcal{E}}
+    \psi_{ij}(\mathbf{r}_i,\mathbf{r}_j),
+    \label{eq:posterior_factorization}
+\end{equation}
+where $\psi_i(\mathbf{y}_i)$ is the prior factor of agent $i$, and
+\[
+    \psi_{ij}(\mathbf{r}_i,\mathbf{r}_j)
+    =
+    p(z_{ij}\mid\mathbf{r}_i,\mathbf{r}_j)
+\]
+is the pairwise measurement factor between node $i$ and $j$. Based on the Gaussian measurement model in \eqref{eq:measurement_model}, this factor becomes
+\begin{equation}
+    \psi_{ij}(\mathbf{r}_i,\mathbf{r}_j)
+    =
+    \frac{1}{\sqrt{2\pi}\sigma_{ij}}
+    \exp\left(
+    -
+    \frac{
+    \left(
+    z_{ij}-\|\mathbf{r}_i-\mathbf{r}_j\|_2
+    \right)^2
+    }{2\sigma_{ij}^2}
+    \right).
+    \label{eq:measurement_factor}
+\end{equation}
+For an anchor node, its coordinate is known and is treated as a fixed value in the pairwise measurement factor.
+
+BP computes local marginal beliefs by passing messages between variable nodes and pairwise factors. Let $t=0,1,2,\ldots$ denote the iteration of BP message passing. At $t=0$, the messages are initialized. For $t\ge1$, let $f_{ij}$ denote the pairwise factor between $i$ and $j$. The variable-to-factor message at iteration $t$ is
+\begin{equation}
+    \mu_{i\rightarrow f_{ij}}^{(t)}(\mathbf{y}_i)
+    =
+    \psi_i(\mathbf{y}_i)
+    \prod_{f_{ik}\in\mathcal{N}_f(i)\setminus \{f_{ij}\}}
+    \mu_{f_{ik}\rightarrow i}^{(t-1)}(\mathbf{y}_i),
+    \label{eq:bp_variable_to_factor}
+\end{equation}
+where $\mathcal{N}_f(i)$ denotes the set of pairwise factors connected to variable node $i$.
+
+The factor-to-variable message at iteration $t$ is
+\begin{equation}
+    \mu_{f_{ij}\rightarrow i}^{(t)}(\mathbf{y}_i)
+    =
+    \int
+    \psi_{ij}(\mathbf{r}_i,\mathbf{r}_j)
+    \mu_{j\rightarrow f_{ij}}^{(t)}(\mathbf{y}_j)
+    \,d\mathbf{y}_j.
+    \label{eq:bp_factor_to_variable}
+\end{equation}
+When $j$ is an anchor, its position is known, \eqref{eq:bp_factor_to_variable} becomes
+\begin{equation}
+    \mu_{f_{ij}\rightarrow i}^{(t)}(\mathbf{y}_i)
+    \propto
+    \psi_{ij}(\mathbf{y}_i,\mathbf{x}_j).
+    \label{eq:bp_anchor_message}
+\end{equation}
+
+After receiving all incoming messages, the belief of agent $i$ at iteration $t$ is
+\begin{equation}
+    b_i^{(t)}(\mathbf{y}_i)
+    \propto
+    \psi_i(\mathbf{y}_i)
+    \prod_{f_{ij}\in\mathcal{N}_f(i)}
+    \mu_{f_{ij}\rightarrow i}^{(t)}(\mathbf{y}_i).
+    \label{eq:bp_belief}
+\end{equation}
+The position estimate is obtained from the mean of the belief:
+\begin{equation}
+    \hat{\mathbf{y}}_i^{(t)}
+    =
+    \int
+    \mathbf{y}_i
+    b_i^{(t)}(\mathbf{y}_i)
+    \,d\mathbf{y}_i.
+    \label{eq:bp_mean}
+\end{equation}
+The covariance estimate is
+\begin{equation}
+    \hat{\mathbf{\Sigma}}_i^{(t)}
+    =
+    \int
+    \left(
+    \mathbf{y}_i-\hat{\mathbf{y}}_i^{(t)}
+    \right)
+    \left(
+    \mathbf{y}_i-\hat{\mathbf{y}}_i^{(t)}
+    \right)^T
+    b_i^{(t)}(\mathbf{y}_i)
+    \,d\mathbf{y}_i.
+    \label{eq:bp_covariance}
+\end{equation}
+Thus, BP provides a position estimate and a covariance estimate for each agent. The covariance describes the position uncertainty under the BP belief.
+
+In practical implementations, the belief and messages can be represented in different forms, such as Gaussian approximations or weighted particle representations. The BP framework above is independent of the specific representation used for the messages and beliefs.
+
+\subsection{Effects of Cycles on BP Covariance Estimates}
+\label{sec:short_cycle_analysis}
+The covariance in \eqref{eq:bp_covariance} describes the uncertainty under the BP belief and may differ from the covariance of the exact marginal posterior. For a selected graph $\mathcal{G}$ and its measurements $Z$, let $p_i^\star(\mathbf{y}_i)$ denote the exact marginal posterior distribution of agent $i$'s position, and let $\mathbf{\Sigma}_i^\star$ denote its covariance:
+\[
+    p_i^\star(\mathbf{y}_i)
+    =p(\mathbf{y}_i\mid Z,\mathcal{G}),
+    \qquad
+    \mathbf{\Sigma}_i^\star
+    =\operatorname{Cov}_{p_i^\star}(\mathbf{y}_i).
+\]
+To focus on the effect of cycles, we assume that messages are represented exactly and that the posterior can be normalized and has a finite covariance.
+
+\begin{figure}[t]
+    \centering
+    \subfloat[Tree structure.\label{fig:bp_tree}]{%
+        \includesvg[
+            width=0.48\linewidth,
+            inkscapelatex=false
+        ]{figures/BP-in-tree}%
+    }
+    \hfill
+    \subfloat[Structure with a cycle.\label{fig:bp_cycle}]{%
+        \includesvg[
+            width=0.48\linewidth,
+            inkscapelatex=false
+        ]{figures/BP-in-cycle}%
+    }
+    \caption{Tree and cyclic structures. Removing node $i$ separates the branches containing $j$ and $k$ in (a), while the added red edge preserves a connection between these branches in (b). Blue arrows stand for message flow.}
+    \label{fig:bp_tree_cycle}
+\end{figure}
+
+As shown in Fig.~\ref{fig:bp_tree}, removing node $i$ from a tree separates its neighboring branches. This separation explains the exactness of BP on trees. Let $\mathcal{N}_a(i)$ denote the anchor neighbors of agent $i$ and $\mathcal{N}_b(i)$ denote its agent neighbors. Since the positions of anchors are fixed, their measurement factor can be absorbed into the unary factor
+\[
+    \phi_i(\mathbf{y}_i)
+    =\psi_i(\mathbf{y}_i)
+    \prod_{a\in\mathcal{N}_a(i)}
+    \psi_{ia}(\mathbf{y}_i,\mathbf{x}_a),
+\]
+After removing node $i$ and all factors connected to it, the remaining factors define a reduced model. Assuming that this model can be normalized, let $q_i(\mathbf{y}_{\mathcal{N}_b(i)})$ denote the joint marginal distribution of the agent neighbors of $i$. The exact marginal posterior $p_i^\star(\mathbf{y}_i)$ then satisfies
+\begin{equation}
+    p_i^\star(\mathbf{y}_i)
+    \propto
+    \phi_i(\mathbf{y}_i)
+    \int
+    q_i(\mathbf{y}_{\mathcal{N}_b(i)})
+    \prod_{j\in\mathcal{N}_b(i)}
+    \psi_{ij}(\mathbf{y}_i,\mathbf{y}_j)
+    \,d\mathbf{y}_{\mathcal{N}_b(i)}.
+    \label{eq:exact_cavity_marginal}
+\end{equation}
+On a tree, removing $i$ disconnects its neighboring branches. Consequently,
+\begin{equation}
+    q_i(\mathbf{y}_{\mathcal{N}_b(i)})
+    =
+    \prod_{j\in\mathcal{N}_b(i)}
+    q_{j\rightarrow i}(\mathbf{y}_j),
+    \label{eq:tree_branch_factorization}
+\end{equation}
+where $q_{j\rightarrow i}(\mathbf{y}_j)$ is the marginal distribution of $\mathbf{y}_j$ in the branch containing agent $j$. Substituting \eqref{eq:tree_branch_factorization} into \eqref{eq:exact_cavity_marginal} yields
+\begin{equation}
+    p_i^\star(\mathbf{y}_i)
+    \propto
+    \phi_i(\mathbf{y}_i)
+    \prod_{j\in\mathcal{N}_b(i)}
+    \left[
+    \int
+    \psi_{ij}(\mathbf{y}_i,\mathbf{y}_j)
+    q_{j\rightarrow i}(\mathbf{y}_j)
+    \,d\mathbf{y}_j
+    \right].
+    \label{eq:tree_exact_bp_marginal}
+\end{equation}
+The integral in \eqref{eq:tree_exact_bp_marginal} has the form of \eqref{eq:bp_factor_to_variable}, which makes \eqref{eq:tree_exact_bp_marginal} reproduce \eqref{eq:bp_belief}. Thus, after sufficient propagation, BP gives $b_i(\mathbf{y}_i)=p_i^\star(\mathbf{y}_i)$ and $\hat{\mathbf{\Sigma}}_i=\mathbf{\Sigma}_i^\star$, which means BP has an exact estimate of position and covariance on a tree.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/corridor7-mechanism.pdf}
+    \caption{Particle BP on the seven-agent tree ((a) and (c)) and the graph with the added edge $(j,k)$ ((b) and (d)). $L$ denotes the cycle length. Ellipses in (a) and (b) describe the exact posterior of node $i$ and the belief of node $i$ estimated by BP. (c) and (d) show the minimum and maximum of the directional variance ratio $\lambda=\mathbf{u}^T\hat{\mathbf{\Sigma}}_i^{(t)}\mathbf{u}/(\mathbf{u}^T\mathbf{\Sigma}_i^{\star}\mathbf{u})$ over nonzero directions $\mathbf{u}$ as BP iteration $t$ increases. Values below the dotted line ($\lambda=1$) indicate directional variance underestimation.}
+    \label{fig:bp_covariance_mechanism}
+\end{figure*}
+
+When $i$ lies on a cycle, some neighboring branches remain connected after its removal, as shown in Fig.~\ref{fig:bp_cycle}. Their joint distribution generally no longer factorizes as in \eqref{eq:tree_branch_factorization}. Nevertheless, BP still constructs the belief by multiplying incoming messages. Although excluding the receiving factor in \eqref{eq:bp_variable_to_factor} prevents immediate feedback along the same edge, information can return through a longer path,
+\[
+    i\rightarrow j\rightarrow k\rightarrow\cdots\rightarrow i.
+\]
+Consequently, incoming messages may depend on information previously supplied by the receiving agent, and BP no longer guarantees exact marginals or covariances.
+
+One possible consequence is overconfidence. Messages arriving along different paths can contain shared information, and their repeated contribution may make the belief excessively concentrated. When overconfidence occurs in a certain direction, the variance estimation of BP in this direction is underestimated, i.e.
+\begin{equation}
+    \mathbf{u}^T\hat{\mathbf{\Sigma}}_i\mathbf{u}
+    <
+    \mathbf{u}^T\mathbf{\Sigma}_i^\star\mathbf{u},
+    \qquad
+    \|\mathbf{u}\|_2=1.
+    \label{eq:directional_overconfidence}
+\end{equation}
+When we use Gaussian approximation for belief, the belief can be represented by an ellipse based on their mean and covariance. Overconfidence makes the ellipse too narrow in the certain direction. If the reported covariance is used to combine with other estimates or measurements, this estimate may receive too much weight. Thus, overconfidence can lead to unreliable decisions even when the position estimate appears reasonable. Overconfident beliefs have also been reported for nonparametric BP in cooperative localization, motivating tree-reweighted message passing~\cite{Savic2011TRWNBP}.
+
+{\color{blue}
+
+To illustrate this mechanism, We consider a tree composed of seven agents $\{i,j,k,a,b,c,d\}$ with edges $\{(i,j),(i,k),(j,a),(j,b),(k,c),(k,d)\}$, as well as a cyclic graph formed by adding an edge $(j,k)$, matching the topology in Fig.~\ref{fig:bp_tree_cycle}. Their independent Gaussian priors have covariance $(1\,\mathrm{m})^2\mathbf{I}_2$ and means $(0,0)$, $(-10,-1)$, $(10,-1)$, $(-15,-2)$, $(-5,-2)$, $(5,-2)$, and $(15,-2)\,\mathrm{m}$, respectively. Positions are sampled from these priors, and independent ranging noise has a standard deviation $0.5\,\mathrm{m}$. We generate 100 independent data trials, each with 128 particles per agent. Each graph is compared with its own exact marginal posterior.
+
+Fig.~\ref{fig:bp_covariance_mechanism} shows the difference between the belief of node $i$ estimated by BP on a tree and a cyclic graph, and the difference between BP estimation and exact posteriors. We can see that BP on the tree gives exact posteriors and achieves correct variance estimation after convergence, while BP on the cyclic graph still produces underestimated variance after convergence and exhibits overconfidence.
+
+\begin{figure*}[t]
+    \centering
+    \subfloat[Nominal versus empirical interval coverage at node $i$.\label{fig:bp_coverage_calibration}]{%
+        \includegraphics[width=0.48\textwidth]{figures/corridor7-calibration.pdf}%
+    }
+    \hfill
+    \subfloat[Variance estimation on different cycle length.\label{fig:bp_cycle_length}]{%
+        \includegraphics[width=0.48\textwidth]{figures/corridor7-cycle-length-comparison.pdf}%
+    }
+    \caption{(a) Comparison between the nominal and actual interval coverage in the $x$-direction of node $i$. Nominal interval coverage refers to the coverage rate reported by BP. The blue and orange curves represent tree BP and BP in the cyclic graph with the cycle length $L=3$, respectively. The thick black dashed curve represents the exact posterior on the cyclic graph. The thin black dashed diagonal indicates equality between nominal and actual coverage. Shaded bands show 95\% confidence intervals for the mean actual coverage. (b) Ratio of the BP-estimated $x$-direction variance to the exact posterior variance as a function of cycle length. The blue curve represents node $i$, and the green curve represents the average over all seven agents. Each graph is compared with its own exact posterior. Values below the dotted line (ratio equals 1) indicate variance underestimation. Points are means of all trials, and error bars show their 95\% confidence intervals.}
+    \label{fig:bp_uncertainty_comparison}
+\end{figure*}
+
+For analysis, we define the interval coverage in the $x$-direction refers to the proportion of the estimated interval that contains the true position in the $x$-direction. As shown in Fig.~\ref{fig:bp_coverage_calibration}, the interval coverage reported by BP in the cyclic graph exhibits lower empirical coverage than those obtained from the exact posterior on the same graph, while tree BP agrees with its exact posterior. This additional undercoverage is consistent with the directional variance underestimation observed above, illustrating how overconfidence can affect the reliability of reported uncertainty.
+
+Short cycles allow information to return through fewer message updates. Fig.~\ref{fig:bp_cycle_length} compares different cycle closures on the same tree. The shorter closures show stronger variance underestimation in this example, supporting the use of triangles as a local indicator of short feedback paths.
+
+Together, the analysis and numerical illustration motivate controlling short feedback paths among unknown agents. Triangles are the shortest such cycles and provide a tractable local indicator. Reducing them can limit immediate sources of cyclic feedback, while the information supplied by their measurement edges must also be considered. This tradeoff motivates the subgraph selection objective in the following section.
+
+}
+
+\subsection{Subgraph Selection Objectives and Overall Framework}
+\label{sec:graph_selection}
+
+Retaining a measurement edge provides a ranging constraint but also requires communication for BP message exchange. We therefore seek a representation that preserves useful localization information while reducing the communication cost of BP and limiting short-cycle feedback.
+
+We introduce a binary variable $s_{ij}\in\{0,1\}$ for each candidate edge $(i,j)\in\mathcal{E}$. An edge is retained when $s_{ij}=1$ and removed when $s_{ij}=0$. Let $\mathbf{s}$ collect all the edge selection variables. These variables determine which measurements are used for cooperative localization.
+
+In cooperative localization, the global Fisher Information Matrix $\mathbf{J}_{G}$ has a symmetric block structure, where each block is of size $2 \times 2$. For any two agents $m, n \in \mathcal{V}_b$, the block entries are given by
+\begin{equation}
+    [\mathbf{J}_G]_{m,n} =
+    \begin{cases} 
+        \mathbf{J}_m^0 + \sum_{j \in \mathcal{N}_m} s_{mj} \mathbf{J}_{mj}, & m = n \\ 
+        -s_{mn} \mathbf{J}_{mn}, & m \neq n \text{ and } (m,n) \in \mathcal{E} \\ 
+        \mathbf{0}_{2 \times 2}, & \text{otherwise} 
+    \end{cases}
+\end{equation}
+where $\mathbf{J}_m^0$ represents the prior FIM of agent $m$, and $\mathcal{N}_m$ denotes the set of its neighbors.
+
+To make explicit the dependence of the global FIM on the topology variables, we next rewrite $\mathbf{J}_G$ as a sum of the contributions of edge-wise information. Let $\mathbf{E}_m \in \mathbb{R}^{2K_b \times 2}$ denote the block expansion matrix associated with the blind agent $m$, whose $m$-th $2 \times 2$ block is $\mathbf{I}_2$ and all remaining blocks are zero. For a blind-agent edge $(m,n) \in \mathcal{E}$, the corresponding global information contribution is
+\[
+    \widetilde{\mathbf{J}}_{mn} = (\mathbf{E}_m - \mathbf{E}_n)\mathbf{J}_{mn}(\mathbf{E}_m - \mathbf{E}_n)^T.
+\]
+For an edge $(m,k) \in \mathcal{E}$ connecting blind agent $m$ to anchor $k$, the anchor position is known and is therefore not included in the unknown coordinate vector. The corresponding contribution is
+\[
+    \widetilde{\mathbf{J}}_{mk} = \mathbf{E}_m\mathbf{J}_{mk}\mathbf{E}_m^T.
+\]
+Accordingly, the global FIM can be written in the following additive form:
+\begin{equation}
+    \mathbf{J}_G(\mathbf{s}) = \mathbf{J}_{\mathrm{prior}} + \sum_{(i,j)\in\mathcal{E}}s_{ij}\widetilde{\mathbf{J}}_{ij},
+    \label{eq:fim_affine_decomposition}
+\end{equation}
+where $\mathbf{J}_{\mathrm{prior}}$ denotes the FIM contributed by the prior of agents. Each term $\widetilde{\mathbf{J}}_{ij}$ represents the information provided by a measurement edge. Equation \eqref{eq:fim_affine_decomposition} therefore shows how edge selection changes the localization information available to the network.
+
+Equation~\eqref{eq:fim_affine_decomposition} describes the information side of the selection problem. Retaining informative edges strengthens the available geometric constraints, but the edges can also create feedback paths of the type discussed in Section~\ref{sec:short_cycle_analysis}. Pruning removes both measurement information and potential feedback paths, while reducing the communication needed for BP. Subgraph selection must balance these effects.
+
+{\color{blue}
+
+To implement this selection, we use a graph neural network (GNN) to predict the retention probability for each undirected measurement edge and produces a binary edge-selection mask. We use a Graph Information Bottleneck (GIB)-based objective for training, which balances localization-relevant information and compression, together with a degree constraint that avoids isolating agents. Once the subgraph is selected, BP uses the retained measurements to calculate the final position estimates and covariances.
+
+}
+
+
+\section{GIB-Based Learning Objective for Subgraph Selection}
+\label{sec:gib_framework}
+This section develops the learning objective for the GNN edge-selection. The Information Bottleneck (IB) principle seeks a representation that preserves information about the target while limiting information retained from the input~\cite{Tishby2000IB}. Graph Information Bottleneck (GIB) extends this perspective to subgraph selection~\cite{Yu2021GIB}.
+
+For cooperative localization, we use a conditional GIB objective to balance localization-relevant information and compression of the selected representation. The required conditional distributions and mutual information terms are generally intractable. We therefore derive a variational bound for the GIB objective in Section~\ref{sec:task_sufficiency} and Section~\ref{sec:structured_prior}, following the variational IB approach~\cite{Alemi2017VIB}. Section~\ref{sec:overall_training} combines the resulting losses with a degree constraint to avoid isolating agents.
+
+\subsection{Conditional GIB Formulation}
+\label{sec:conditional_gib}
+
+{\color{blue}
+
+Let $C$ denote the initial context containing the initial agent position estimates and covariances, anchor positions and identities, and candidate edges. $C$ remains available after edge selection and is independent of the GNN parameters. The target variable is the global coordinate vector of all agents $Y$ defined in Section~\ref{sec:system_model}.
+
+For each candidate measurement edge $(i,j)\in\mathcal E(C)$, let $v_{ij}=\sigma_{ij}^{2}$ denote its ranging noise variance. Let $A_{ij}$ denote the edge-level ranging record, and $D$ denote the collection of all candidate edges and measurements:
+\[
+    A_{ij}=(z_{ij},v_{ij}),
+    \qquad
+    D=\{A_{ij}\}_{(i,j)\in\mathcal E(C)}.
+\]
+
+Let $R$ denote the selected representation
+\[
+    R=\left(\mathbf s,\{A_{ij}:s_{ij}=1\}\right).
+\]
+where $\mathbf s$ is the binary edge-selection mask defined in Section~\ref{sec:graph_selection}.
+
+Let $\theta$ denote the GNN parameters. It defines the selection policy $p_\theta(\mathbf s\mid D,C)$, which gives one binary decision for each undirected measurement edge.
+
+we define the conditional GIB objective $\mathcal J_{\mathrm{GIB}}(\theta)$ as
+\begin{equation}
+    \mathcal J_{\mathrm{GIB}}(\theta)
+    =
+    -I(Y;R\mid C)
+    +\beta I(D;R\mid C),
+    \label{eq:GIB_objective}
+\end{equation}
+where $\beta$ is a positive coefficient. $I(Y;R\mid C)$ is the task-sufficiency term, maximizing it encourages $R$ to preserve information about agent positions $Y$ for the localization task. $I(D;R\mid C)$ is the compression term. Given $C$, minimizing it limits the amount of information about the input $D$ retained in $R$, which promotes compression of the graph structure.
+
+The following two subsections derive a variational lower bound for the task term and an upper bound for the compression term, yielding a computable training loss.
+
+}
+
+\subsection{Variational Bound for the Task Sufficiency Term}
+\label{sec:task_sufficiency}
+Direct computation of $I(Y;R\mid C)$ requires the true distribution $p(Y\mid R,C)$, which is generally not available. Instead, we introduce a prediction distribution $q_{\mathrm{pred}}(Y\mid R,C)$ to derive a variational lower bound. The conditional KL divergence gives
+\begin{equation}
+    \begin{aligned}
+    I(Y;R\mid C)
+    ={}& h(Y\mid C)
+    +\mathbb{E}\!
+    \left[\log q_{\mathrm{pred}}(Y\mid R,C)\right]\\
+    &+\mathbb{E}_{R,C}
+    D_{\mathrm{KL}}\!
+    \left(
+    p(Y\mid R,C)
+    \parallel q_{\mathrm{pred}}(Y\mid R,C)
+    \right).
+    \end{aligned}
+    \label{eq:task_kl_identity}
+\end{equation}
+
+The KL term is nonnegative, so the task information has the lower bound
+\begin{equation}
+    I(Y;R\mid C)
+    \ge
+    h(Y\mid C)
+    +\mathbb E\!\left[\log q_{\mathrm{pred}}(Y\mid R,C)\right].
+    \label{eq:task_information_bound}
+\end{equation}
+Because the data distribution of $(Y,C)$ is fixed with respect to $\theta$, the entropy $h(Y\mid C)$ is constant during optimization. We therefore define the task loss as the expected negative log-likelihood
+\begin{equation}
+    \mathcal L_{\mathrm{task}}
+    =
+    -\mathbb E\!\left[\log q_{\mathrm{pred}}(Y\mid R,C)\right],
+    \label{eq:task_nll}
+\end{equation}
+The lower bound is consequently $h(Y\mid C)-\mathcal L_{\mathrm{task}}$, and minimizing $\mathcal L_{\mathrm{task}}$ maximizes this bound.
+
+To obtain a computable task loss, we construct a Gaussian prediction distribution $q_{\mathrm{pred}}(Y\mid R,C)$ from the initial position estimates in $C$ and the selected $A_{ij}$ in $R$. Its mean and covariance provide the position prediction and the corresponding uncertainty estimate.
+
+Let $\bar Y$ denote the initial agent position estimate in $C$. And define
+\[
+    \boldsymbol{\Delta}=Y-\bar Y.
+\]
+
+To construct $q_{\mathrm{pred}}$, we assign each agent an independent Gaussian prior with its initial position estimate as the mean and $\mathbf{\Sigma}_{0,i}\succ0$ as the covariance. The joint prior is
+\[
+    Y\sim\mathcal N(\bar Y,\mathbf J_0^{-1}),
+    \qquad
+    \mathbf J_0
+    =
+    \operatorname{blkdiag}
+    \left(
+    \mathbf{\Sigma}_{0,1}^{-1},
+    \ldots,
+    \mathbf{\Sigma}_{0,K_b}^{-1}
+    \right).
+\]
+Here, $\operatorname{blkdiag}$ forms a block-diagonal matrix, and $\mathbf J_0$ is the prior precision matrix. Since $\boldsymbol{\Delta}=Y-\bar Y$,
+\[
+    \boldsymbol{\Delta}
+    \sim\mathcal N(\mathbf 0,\mathbf J_0^{-1}).
+\]
+
+Let $\bar{\mathbf r}_i$ be the initial coordinate of an agent or the known coordinate of an anchor. For each candidate edge, define
+\[
+    \bar d_{ij}
+    =
+    \|\bar{\mathbf r}_i-\bar{\mathbf r}_j\|_2.
+\]
+We assume that connected nodes have distinct initial coordinates, so that $\bar d_{ij}>0$. Linearizing the distance at $\bar Y$ gives
+\[
+    d_{ij}(Y)
+    \approx
+    \bar d_{ij}
+    +\mathbf g_{ij}^{T}\boldsymbol{\Delta},
+    \qquad
+    \mathbf g_{ij}
+    =
+    \left.\nabla_Y d_{ij}(Y)\right|_{Y=\bar Y}.
+\]
+
+The vector $\mathbf g_{ij}$ is the gradient of $d_{ij}(Y)$ with respect to $Y$, evaluated at $\bar Y$. Define
+\[
+    \mathbf u_{ij}
+    =
+    \frac{\bar{\mathbf r}_i-\bar{\mathbf r}_j}
+    {\bar d_{ij}}.
+\]
+For an agent--agent edge, the blocks of $\mathbf g_{ij}$ corresponding to agents $i$ and $j$ are $\mathbf u_{ij}$ and $-\mathbf u_{ij}$, respectively. All other blocks are zero. For an agent--anchor edge with agent $i$ and anchor $j$, only the block corresponding to agent $i$ is nonzero and equals $\mathbf u_{ij}$.
+
+Define the ranging residual
+\[
+    r_{ij}=z_{ij}-\bar d_{ij}.
+\]
+Using the range linearization, we model $r_{ij}$ as
+\[
+    r_{ij}
+    =
+    \mathbf g_{ij}^{T}\boldsymbol{\Delta}
+    +\epsilon_{ij},
+    \qquad
+    \epsilon_{ij}\sim
+    \mathcal N(0,\widetilde\sigma_{ij}^{2}).
+\]
+The noise terms $\epsilon_{ij}$ are independent across edges. Their variances are fixed in the local model and bounded below by $\sigma_{\min}^{2}>0$:
+\[
+    \widetilde\sigma_{ij}^{2}
+    =
+    \max(\sigma_{ij}^{2},\sigma_{\min}^{2}).
+\]
+
+Multiplying the prior by the likelihoods of the selected measurements gives
+\begin{equation}
+    \begin{aligned}
+    &q_{\mathrm{pred}}
+    (\bar Y+\boldsymbol{\Delta}\mid R,C)\\
+    &\quad\propto
+    \exp\Bigg[
+    -\frac12\boldsymbol{\Delta}^{T}
+    \mathbf J_0\boldsymbol{\Delta}\\
+    &\qquad\qquad
+    -\frac12
+    \sum_{(i, j)\in\mathcal E(C)}
+    \frac{s_{ij}}{\widetilde\sigma_{ij}^{2}}
+    \left(
+    r_{ij}-\mathbf g_{ij}^{T}\boldsymbol{\Delta}
+    \right)^2
+    \Bigg].
+    \end{aligned}
+    \label{eq:local_prediction_product}
+\end{equation}
+The quadratic term involving $\mathbf J_0$ comes from the prior, and the sum includes the measurement likelihood terms for edges with $s_{ij}=1$.
+
+Collecting the quadratic and linear terms in \eqref{eq:local_prediction_product} gives the precision matrix $\mathbf J_{\mathbf s}$ and information vector $\mathbf b_{\mathbf s}$:
+\begin{equation}
+    \begin{aligned}
+    \mathbf J_{\mathbf s}
+    &=
+    \mathbf J_0+
+    \sum_{(i,j)\in\mathcal E(C)}
+    \frac{s_{ij}}{\widetilde\sigma_{ij}^{2}}
+    \mathbf g_{ij}\mathbf g_{ij}^{T},\\
+    \mathbf b_{\mathbf s}
+    &=
+    \sum_{(i,j)\in\mathcal E(C)}
+    \frac{s_{ij}}{\widetilde\sigma_{ij}^{2}}
+    \mathbf g_{ij}r_{ij}.
+    \end{aligned}
+    \label{eq:prediction_precision}
+\end{equation}
+Since $\mathbf J_0\succ0$ and each measurement contribution is positive semidefinite, $\mathbf J_{\mathbf s}\succ0$. The position correction $\boldsymbol\delta$ is therefore uniquely determined by the linear system
+\begin{equation}
+    \mathbf J_{\mathbf s}\boldsymbol\delta
+    =
+    \mathbf b_{\mathbf s}.
+    \label{eq:prediction_update}
+\end{equation}
+Completing the square yields the prediction mean and covariance:
+\[
+    \boldsymbol\mu(R,C)=\bar Y+\boldsymbol\delta,
+    \qquad
+    \mathbf S(R,C)=\mathbf J_{\mathbf s}^{-1}.
+\]
+The resulting auxiliary prediction distribution is
+\begin{equation}
+    q_{\mathrm{pred}}(Y\mid R,C)
+    =
+    \mathcal N\!\left(
+    Y;\boldsymbol\mu(R,C),\mathbf S(R,C)
+    \right).
+    \label{eq:prediction_distribution}
+\end{equation}
+
+Let $\mathbf e=Y-\boldsymbol\mu(R,C)$ denote the prediction error. Substituting this Gaussian distribution into \eqref{eq:task_nll} gives the computable task loss
+\begin{equation}
+    \mathcal L_{\mathrm{task}}
+    \doteq
+    \frac12\mathbb E
+    \left[
+    -\log\det\mathbf J_{\mathbf s}
+    +\mathbf e^{T}\mathbf J_{\mathbf s}\mathbf e
+    \right],
+    \label{eq:linear_task_loss}
+\end{equation}
+where $\doteq$ denotes equality up to additive terms independent of $\theta$. The expectation is taken over training samples and masks sampled from $p_\theta(\mathbf s\mid D,C)$.
+
+\subsection{Variational Bound for the Structure Compression Term}
+\label{sec:structured_prior}
+
+To derive the variational upper bound of $I(D;R\mid C)$, we construct a reference distribution $q_{\mathrm{ref}}(R\mid C)$, which contains the communication cost constraint and the short-cycle constraint introduced in Section~\ref{sec:graph_selection}.
+
+Given $C$, define the total communication cost as
+
+\begin{equation}
+    E(\mathbf s;C)
+    =
+    \sum_{(i, j)\in\mathcal E(C)}
+    s_{ij}E_{ij}(C),
+    \label{eq:graph_energy}
+\end{equation}
+
+where $E_{ij}(C)$ is the cost to retain edge $(i,j)$ for BP communication, which can be estimated as
+
+\[
+    E_{ij}(C)
+    =
+    \rho
+    \|\bar{\mathbf r}_i-\bar{\mathbf r}_j\|_2^2,
+    \qquad \rho>0.
+\]
+
+Let $\mathcal T(C)$ be the set of triangles whose vertices are all agents and whose edges belong to $\mathcal E(C)$. Define the number of selected agent triangles as
+\begin{equation}
+    C_3(\mathbf s;C)
+    =
+    \sum_{\substack{\{i,j,k\}\in\mathcal T(C)\\i<j<k}}
+    s_{ij}s_{jk}s_{ik}.
+    \label{eq:triangle_count}
+\end{equation}
+Anchor edges are included in the communication cost but not in $C_3(\mathbf s;C)$.
+
+We first construct $q(\mathbf s\mid C)$ by maximizing entropy subject to bounds on the expected communication cost and triangle count. Given $C$, let $B_E(C)$ and $B_3(C)$ denote these bounds, respectively. We consider
+\begin{equation}
+    \begin{aligned}
+    \max_q\quad&
+    -\sum_{\mathbf s}q(\mathbf s\mid C)
+    \log q(\mathbf s\mid C)\\
+    \mathrm{s.t.}\quad&
+    \mathbb E_q[E(\mathbf s;C)]\le B_E(C),\\
+    &\mathbb E_q[C_3(\mathbf s;C)]\le B_3(C),\\
+    &\sum_{\mathbf s}q(\mathbf s\mid C)=1,\qquad
+    q(\mathbf s\mid C)\ge0.
+    \end{aligned}
+    \label{eq:max_entropy_formulation}
+\end{equation}
+Let $\gamma,\kappa\ge0$ be the Lagrange multipliers for the two bounds, and let $\nu$ be the multiplier for normalization. The Lagrangian is
+\[
+\begin{aligned}
+    \mathcal L(q,\gamma,\kappa,\nu)
+    ={}&
+    -\sum_{\mathbf s}q(\mathbf s\mid C)
+    \log q(\mathbf s\mid C)\\
+    &-\gamma\left(
+    \sum_{\mathbf s}q(\mathbf s\mid C)E(\mathbf s;C)-B_E(C)
+    \right)\\
+    &-\kappa\left(
+    \sum_{\mathbf s}q(\mathbf s\mid C)C_3(\mathbf s;C)-B_3(C)
+    \right)\\
+    &+\nu\left(\sum_{\mathbf s}q(\mathbf s\mid C)-1\right).
+\end{aligned}
+\]
+Setting the derivative with respect to $q(\mathbf s\mid C)$ to zero gives
+\begin{equation}
+    q(\mathbf s\mid C)
+    =
+    \frac1{\mathcal Z(C)}
+    \exp\!\left[
+    -\gamma E(\mathbf s;C)
+    -\kappa C_3(\mathbf s;C)
+    \right],
+    \label{eq:structured_prior}
+\end{equation}
+where
+\[
+    \mathcal Z(C)
+    =
+    \sum_{\mathbf s}
+    \exp\!\left[
+    -\gamma E(\mathbf s;C)
+    -\kappa C_3(\mathbf s;C)
+    \right].
+\]
+
+For training, we use this exponential form with fixed $\gamma$ and $\kappa$, which control the weights on communication cost and triangle count, respectively.
+
+Since the selected ranging records are also part of $R$, their retention must be included in the compression cost. We represent $z_{ij}$ and $v_{ij}$ with fixed numerical precision. Let $\mathcal A_{ij}(C)$ be the finite set of possible encoded values of $A_{ij}$ and define
+\[
+    M_{ij}(C)=|\mathcal A_{ij}(C)|.
+\]
+For each selected edge, we use a uniform reference over this finite set:
+
+\begin{equation}
+    q_{ij}(A_{ij}\mid C)
+    =
+    \frac1{M_{ij}(C)},
+    \qquad A_{ij}\in\mathcal A_{ij}(C).
+    \label{eq:data_reference}
+\end{equation}
+This reference assigns an equal probability to all possible values of $A_{ij}$.
+
+We define the reference distribution for $R$ as
+\begin{equation}
+    q_{\mathrm{ref}}(R\mid C)
+    =
+    q(\mathbf s\mid C)
+    \prod_{(i, j):s_{ij}=1}
+    q_{ij}(A_{ij}\mid C).
+    \label{eq:complete_reference}
+\end{equation}
+Under this reference distribution, the selected $A_{ij}$ are independent given $C$ and $\mathbf s$.
+
+Define
+\[
+    \mathcal U_{\mathrm{comp}}
+    =
+    \mathbb E_{D,C}
+    D_{\mathrm{KL}}\!
+    \left(
+    p_\theta(R\mid D,C)
+    \parallel q_{\mathrm{ref}}(R\mid C)
+    \right).
+\]
+The KL decomposition yields
+\begin{equation}
+    \begin{aligned}
+    \mathcal U_{\mathrm{comp}}
+    ={}& I(D;R\mid C)\\
+    &+\mathbb E_C
+    D_{\mathrm{KL}}\!
+    \left(
+    p_\theta(R\mid C)
+    \parallel q_{\mathrm{ref}}(R\mid C)
+    \right).
+    \end{aligned}
+    \label{eq:compression_kl_identity}
+\end{equation}
+Therefore,
+\begin{equation}
+    I(D;R\mid C)
+    \le \mathcal U_{\mathrm{comp}}.
+    \label{eq:variational_bound}
+\end{equation}
+
+We assume that the edge-selection variables are independent given $D$ and $C$:
+\begin{equation}
+    p_\theta(\mathbf s\mid D,C)
+    =
+    \prod_{(i, j)\in\mathcal E(C)}
+    p_{ij}^{s_{ij}}(1-p_{ij})^{1-s_{ij}},
+    \label{eq:p_factorized}
+\end{equation}
+where $p_{ij}=p_\theta(s_{ij}=1\mid D,C)$ is the retention probability predicted by the GNN. Given $D$ and $C$, each $\mathbf s$ uniquely determines $R$. Thus, $p_\theta(R\mid D,C)=p_\theta(\mathbf s\mid D,C)$ for the corresponding $R$, and the KL divergence can be evaluated by summing over $\mathbf s$.
+
+Given $D$ and $C$, the entropy of $p_\theta(\mathbf s\mid D,C)$ is
+\begin{equation}
+    H_\theta(D,C)
+    =
+    -\sum_{(i, j)\in\mathcal E(C)}
+    \left[
+    p_{ij}\log p_{ij}
+    +(1-p_{ij})\log(1-p_{ij})
+    \right].
+    \label{eq:entropy_of_p_theta}
+\end{equation}
+The expected communication cost and triangle count are
+\begin{equation}
+    \mathbb E_{\mathbf s\mid D,C}[E(\mathbf s;C)]
+    =
+    \sum_{(i, j)}p_{ij}E_{ij}(C),
+    \label{eq:expected_energy}
+\end{equation}
+\begin{equation}
+    \mathbb E_{\mathbf s\mid D,C}[C_3(\mathbf s;C)]
+    =
+    \sum_{\substack{\{i,j,k\}\in\mathcal T(C)\\i<j<k}}
+    p_{ij}p_{jk}p_{ik}.
+    \label{eq:expected_triangle}
+\end{equation}
+Equation \eqref{eq:expected_triangle} follows from the independence of the edge-selection variables given $D$ and $C$.
+
+Expanding the complete KL gives
+\begin{equation}
+    \begin{aligned}
+    \mathcal U_{\mathrm{comp}}
+    =
+    \mathbb E_{D,C}\Bigg[
+    &-H_\theta(D,C)
+    +\gamma\sum_{(i, j)}p_{ij}E_{ij}(C)\\
+    &+\kappa
+    \sum_{\substack{\{i,j,k\}\in\mathcal T(C)\\i<j<k}}
+    p_{ij}p_{jk}p_{ik}\\
+    &+\sum_{(i, j)}p_{ij}\log M_{ij}(C)
+    +\log\mathcal Z(C)
+    \Bigg].
+    \end{aligned}
+    \label{eq:full_kl}
+\end{equation}
+
+Equations~\eqref{eq:variational_bound} and \eqref{eq:full_kl} provide the required upper bound and its computable expansion. The distribution of $C$, the edge costs, the triangle set, the record encoding, and the reference parameters $\gamma,\kappa$ are fixed during optimization. Therefore, $\mathbb E_C[\log\mathcal Z(C)]$ is independent of $\theta$. Removing only this additive constant defines the compression loss
+
+\begin{equation}
+    \begin{aligned}
+    \mathcal L_{\mathrm{comp}}
+    =
+    \mathbb E_{D,C}\Bigg[
+    &-H_\theta(D,C)
+    +\gamma\sum_{(i, j)}p_{ij}E_{ij}(C)\\
+    &+\kappa
+    \sum_{\substack{\{i,j,k\}\in\mathcal T(C)\\i<j<k}}
+    p_{ij}p_{jk}p_{ik}\\
+    &+\sum_{(i, j)}p_{ij}\log M_{ij}(C)
+    \Bigg].
+    \end{aligned}
+    \label{eq:compression_loss}
+\end{equation}
+
+The upper bound and the compression loss are related by
+\begin{equation}
+    \mathcal U_{\mathrm{comp}}
+    =
+    \mathcal L_{\mathrm{comp}}
+    +\mathbb E_C[\log\mathcal Z(C)].
+    \label{eq:compression_constant}
+\end{equation}
+Thus, minimizing $\mathcal L_{\mathrm{comp}}$ is equivalent to minimizing the upper bound $\mathcal U_{\mathrm{comp}}$. Its four terms are the negative selection entropy, expected communication cost, expected number of agent triangles, and expected cost of retaining ranging records.
+
+{\color{blue}
+
+\subsection{Overall Training Loss}
+\label{sec:overall_training}
+Combining the task lower bound in \eqref{eq:task_information_bound} with the compression upper bound in \eqref{eq:variational_bound} gives an upper bound on the original conditional GIB objective:
+\begin{equation}
+    \begin{aligned}
+    \mathcal J_{\mathrm{GIB}}(\theta)
+    &\le
+    \mathcal L_{\mathrm{task}}
+    +\beta\mathcal U_{\mathrm{comp}}
+    -h(Y\mid C)\\
+    &=
+    \mathcal L_{\mathrm{task}}
+    +\beta\mathcal L_{\mathrm{comp}}
+    +\beta\mathbb E_C[\log\mathcal Z(C)]
+    -h(Y\mid C).
+    \end{aligned}
+    \label{eq:gib_training_bound}
+\end{equation}
+The last two terms are independent of $\theta$. After removing these constants, we define the variational GIB training loss as
+\begin{equation}
+    \mathcal L_{\mathrm{GIB}}
+    :=
+    \mathcal L_{\mathrm{task}}
+    +\beta\mathcal L_{\mathrm{comp}}.
+    \label{eq:gib_train_objective}
+\end{equation}
+Minimizing this loss minimizes the bound rather than evaluating the original objective exactly.
+
+To discourage excessive pruning around agents, we add the degree constraint
+\begin{equation}
+    \mathcal L_{\mathrm{deg}}
+    =
+    \mathbb E_{C,D,\mathbf s}
+    \left[
+    \sum_{i\in\mathcal V_b}
+    \max(0,3-D_i(\mathbf s))
+    \right],
+    \label{eq:degree_loss}
+\end{equation}
+where
+\[
+    D_i(\mathbf s)
+    =
+    \sum_{j:(i,j)\in\mathcal E(C)}s_{ij}
+\]
+is the number of retained measurement edges incident to agent $i$, including anchor edges. Each undirected edge uses the same decision at both endpoints. The threshold of three is a heuristic motivated by planar trilateration with three known, noncollinear reference positions.
+
+The total loss for training the GNN is
+\begin{equation}
+    \begin{aligned}
+    \mathcal L_{\mathrm{total}}
+    &=
+    \mathcal L_{\mathrm{GIB}}
+    +\eta\mathcal L_{\mathrm{deg}}\\
+    &=
+    \mathcal L_{\mathrm{task}}
+    +\beta\mathcal L_{\mathrm{comp}}
+    +\eta\mathcal L_{\mathrm{deg}},
+    \end{aligned}
+    \label{eq:total_loss}
+\end{equation}
+where $\beta>0$ balances task information and compression, and $\eta\ge0$ controls the degree constraint. The task loss evaluates the position prediction, the compression loss encodes preferences for lower communication costs and fewer agent triangles, and the degree constraint limits the incentive to prune too aggressively.
+
+}
+
+
+\section{GNN-based Topology Optimization Framework}
+\label{sec:gnn_framework}
+This section implements the edge-selection policy introduced in Section~\ref{sec:graph_selection} and trained with the total loss in \eqref{eq:total_loss}. Sections~\ref{sec:feature_construction} and \ref{sec:edge_scoring} describe the features, message passing, and edge retention probabilities. Section~\ref{sec:graph_sampling} introduces the continuous relaxation and straight-through estimator used to approximate gradients through discrete selection.
+
+{\color{blue}
+
+\subsection{Feature Construction and Input Encoding}
+\label{sec:feature_construction}
+The GNN operates on the candidate measurement graph described by $C$ and $D$. We distinguish the raw node and edge features from their encoded hidden representations.
+
+Let $\bar{\mathbf r}_i$ denote the initial position estimate of an agent or the known position of an anchor, as in Section~\ref{sec:task_sufficiency}. The raw node feature is
+\[
+    \mathbf f_i
+    =
+    \left[
+    \bar{\mathbf r}_i^{T},
+    \sigma_{x,i}^{2},
+    \sigma_{y,i}^{2},
+    a_i
+    \right]^{T}
+    \in\mathbb R^{5},
+\]
+where $\sigma_{x,i}^{2}$ and $\sigma_{y,i}^{2}$ are the initial position variances along the two coordinate axes, and $a_i\in\{0,1\}$ indicates whether node $i$ is an anchor. For a known anchor position, both position variances are zero.
+
+The raw feature of candidate edge $(i,j)$ is
+\[
+    \mathbf f_{ij}
+    =
+    \left[
+    z_{ij},
+    v_{ij},
+    |r_{ij}|,
+    e_{ij}^{a}
+    \right]^{T}
+    \in\mathbb R^{4},
+\]
+where $v_{ij}=\sigma_{ij}^{2}$ is the associated measurement noise variance and $e_{ij}^{a}\in\{0,1\}$ indicates an agent--anchor edge. The absolute ranging residual is
+\begin{equation}
+    |r_{ij}|
+    =
+    \left|
+    z_{ij}
+    -
+    \|\bar{\mathbf r}_i-\bar{\mathbf r}_j\|_2
+    \right|.
+    \label{eq:residual_def}
+\end{equation}
+This residual measures the agreement between the observed range and the distance implied by the initial coordinates.
+
+Let $d_h$ denote the hidden dimension. Node and edge encoders map the raw features to hidden representations:
+\[
+    \mathbf h_i^{(0)}
+    =
+    \operatorname{Enc}_v(\mathbf f_i)
+    \in\mathbb R^{d_h},
+    \qquad
+    \mathbf e_{ij}
+    =
+    \operatorname{Enc}_e(\mathbf f_{ij})
+    \in\mathbb R^{d_h}.
+\]
+The node encoder is shared across nodes, and the edge encoder is shared across candidate edges. The same encoded edge feature is used for both message directions of an undirected edge.
+
+}
+
+\subsection{Message Passing and Edge Scoring}
+\label{sec:edge_scoring}
+The GNN aggregates information over the candidate graph through $L$ message-passing layers. Let $\mathcal N_i(C)$ denote the candidate neighbors of node $i$. At layer $l$, a message from node $j$ to node $i$ is computed from their hidden states and the encoded edge feature. The node state is then updated using the sum of its incoming messages:
+\begin{align}
+    \mathbf m_{j\rightarrow i}^{(l)}
+    &=
+    \operatorname{MLP}_{\mathrm{msg}}^{(l)}
+    \left(
+    \left[
+    \mathbf h_i^{(l-1)}
+    \parallel
+    \mathbf h_j^{(l-1)}
+    \parallel
+    \mathbf e_{ij}
+    \right]
+    \right),
+    \label{eq:message_passing}\\
+    \mathbf h_i^{(l)}
+    &=
+    \operatorname{MLP}_{\mathrm{upd}}^{(l)}
+    \left(
+    \left[
+    \mathbf h_i^{(l-1)}
+    \parallel
+    \sum_{j\in\mathcal N_i(C)}
+    \mathbf m_{j\rightarrow i}^{(l)}
+    \right]
+    \right).
+    \label{eq:node_update}
+\end{align}
+Here, $\parallel$ denotes concatenation. The message and update networks map $\mathbb R^{3d_h}$ and $\mathbb R^{2d_h}$, respectively, to $\mathbb R^{d_h}$. Within each layer, their parameters are shared across edges and nodes, respectively. Messages are computed in both directions of every candidate measurement edge.
+
+After $L$ layers, a shared scoring MLP maps the concatenated endpoint states and edge feature to a scalar. To make the retention probability independent of endpoint ordering, we evaluate this network in both orders:
+\[
+    a_{ij}
+    =
+    \operatorname{MLP}_{\mathrm{score}}
+    \left(
+    \left[
+    \mathbf h_i^{(L)}
+    \parallel
+    \mathbf h_j^{(L)}
+    \parallel
+    \mathbf e_{ij}
+    \right]
+    \right),
+\]
+\[
+    a_{ji}
+    =
+    \operatorname{MLP}_{\mathrm{score}}
+    \left(
+    \left[
+    \mathbf h_j^{(L)}
+    \parallel
+    \mathbf h_i^{(L)}
+    \parallel
+    \mathbf e_{ij}
+    \right]
+    \right).
+\]
+The symmetric edge logit and retention probability are
+\[
+    \ell_{ij}
+    =
+    \frac12(a_{ij}+a_{ji}),
+    \qquad
+    p_{ij}
+    =
+    \operatorname{sigmoid}(\ell_{ij}).
+\]
+Consequently, $\ell_{ij}=\ell_{ji}$ and $p_{ij}=p_{ji}$. Bidirectional GNN messages share a single retention probability and selection decision for each undirected measurement edge.
+
+\subsection{Graph Sampling via Gumbel-Sigmoid and Straight-Through Estimation}
+\label{sec:graph_sampling}
+Binary edge decisions prevent direct differentiation through the selection step. We use a Gumbel-Sigmoid relaxation to obtain continuous edge variables and a straight-through estimator (STE) to combine binary forward decisions with approximate backward gradients.
+
+For each undirected candidate edge, we independently sample logistic noise
+\[
+    \xi_{ij}
+    =
+    \log u_{ij}-\log(1-u_{ij}),
+    \qquad
+    u_{ij}\sim\mathcal U(0,1).
+\]
+Using the edge logit $\ell_{ij}$ defined in Section~\ref{sec:edge_scoring}, the relaxed selection variable is
+\begin{equation}
+    \tilde s_{ij}
+    =
+    \operatorname{sigmoid}
+    \left(
+    \frac{\ell_{ij}+\xi_{ij}}{\tau}
+    \right),
+    \label{eq:continuous_relaxation}
+\end{equation}
+where $\tau>0$ controls the smoothness of the relaxation. Decreasing $\tau$ makes the relaxed variable more concentrated near zero or one. For fixed logits and noise samples, a positive temperature does not change the binary decision obtained by thresholding $\tilde s_{ij}$ at $0.5$, it changes the relaxed values and their gradients.
+
+The forward pass uses the hard decision
+\begin{equation}
+    s_{ij}^{\mathrm{hard}}
+    =
+    \begin{cases}
+        1, & \tilde s_{ij}>0.5,\\
+        0, & \text{otherwise}.
+    \end{cases}
+    \label{eq:forward_hard}
+\end{equation}
+Only one noise sample and one hard decision are used for each undirected measurement edge.
+
+To propagate gradients through this decision, we define
+\begin{equation}
+    s_{ij}
+    =
+    s_{ij}^{\mathrm{hard}}
+    -
+    \operatorname{detach}(\tilde s_{ij})
+    +
+    \tilde s_{ij},
+    \label{eq:backward_ste}
+\end{equation}
+where $\operatorname{detach}$ preserves the numerical value while blocking its gradient. Thus, the forward value is binary, while the backward gradient follows the continuous relaxation.
+
+
+\section{Simulation Results and Discussions}
+In this section, numerical results are presented for evaluating the performance of the proposed LPP strategy. In the simulation settings, the agents and anchors are randomly placed in a 100~m $\times$ 100~m squared field, and the network includes an eavesdropper listening for signal measurements from legitimate nodes\footnote{The proposed method can be extended to scenarios where multiple eavesdroppers exist in the network. Since eavesdroppers remain silent while intercepting signals, the results are not affected by their number.}. In the performance analysis of non-cooperative positioning, the network contains only one agent, and we analyze the performance with varying numbers of anchor nodes, ranging from 3 to 12. In the cooperative positioning mode, the number of agents varies from 1 to 5, accompanied by a performance comparison under different numbers of anchors. The free-space propagation model is adopted for inter-node measurements, with the path-loss exponent set to 2, and the channel parameter given by $\xi_{ij}=10^3/d_{ij}^2$~\cite{2018proc-Win}. We evaluate the performance of the proposed algorithms in terms of positioning accuracy and location privacy protection, comparing them against two benchmark power allocation strategies: uniform power allocation and the LPP strategy introduced in \cite{2019TC-Zhang}. The uniform strategy allocates the total power equally among all involved anchors. The strategy in \cite{2019TC-Zhang}, denoted as `TL' in the figures,  uses a Taylor linearization (TL)-based algorithm to perform power allocation under some estimation constraints. The power distribution results for the proposed optimization problems, obtained using the gradient-decent based method and quadratic programming method, are represented as `GD' and `QP', respectively. To demonstrate the impact of privacy protection protocols on positioning performance, we include a comparison with an optimal power allocation strategy that minimizes positioning errors without enforcing privacy constraints, labeled as `NPC' (no privacy constraint). The proposed QP-based optimization problem of power allocation is solved using the optimization solver SeDuMi\cite{sedumi}.
+
+\subsection{Non-cooperative Localization}
+We first evaluate how the LSM changes under the influence of different factors. Fig.~\ref{fig.LSM} shows the LSM as a function of the number of anchors for different search regions and total transmitted power. It is important to clarify that a larger LSM value indicates a lower risk of node location leakage and higher anti-eavesdropping capability. From the figure, we observe that the LSM decreases as the number of anchors increases across all settings of the search radius and the total transmitted power. This trend is due to the enhanced positioning accuracy provided by a greater number of anchors, which makes the actual position of the agent more identifiable. Although increased accuracy is beneficial for localization, it also heightens the risk of location disclosure. This inverse relationship is consistent with the theoretical understanding as discussed above that a more precise position estimate increases the likelihood of revealing the node's position. The figure also demonstrates that higher total transmitted power leads to a decrease in LSM, which is attributed to the improved positioning accuracy resulting from stronger signals. The search range also significantly affects the LSM. A larger search range enhances the eavesdropper's ability to intercept signals, thus increasing the likelihood of location leakage. The broader the area covered by the eavesdropper, the easier it becomes to deduce the positions of legitimate nodes.
+
+%==========Fig. LSM VS search_region non-cooperative ==========
+\begin{figure}
+%\vspace{-10pt}
+  \centering
+    \includegraphics[scale = 0.5]{figures/LSM_non.eps}\\
+  \caption{LSM for different search regions and transmitted powers.}\label{fig.LSM}
+\vspace{-10pt}
+\end{figure}
+
+Fig.~\ref{fig.number_non} illustrates the system performance in non-cooperative localization systems, plotted against the number of anchors. Fig.~\ref{fig.number_non}(a) shows that increasing the number of anchors improves localization accuracy across all strategies. However, the rate of improvement diminishes as the number of anchors continues to rise, indicating that beyond a certain point, additional anchors offer limited benefits in enhancing accuracy. When privacy constraints are enforced, as is the case for all strategies except NPC, a noticeable reduction in localization accuracy is observed. Among these privacy-aware methods, the QP-based power allocation strategy consistently achieves the highest localization accuracy. This performance advantage is particularly pronounced when fewer anchors are used, where the QP-based method significantly outperforms the other strategies. As shown in Fig.~\ref{fig.number_non}(b), the LSM decreases as the number of anchors increases, indicating that utilizing fewer anchors reduces the risk of an agent's location being exposed to eavesdroppers. When more anchors participate in localization (i.e., more than six in the simulation setting), the QP-based power allocation strategy achieves the highest level of privacy protection among the five methods. This is due to the incorporation of the lower bound of LSM as a constraint in the optimization problem. Although the GD-based power allocation strategy does not yield optimal positioning performance (comparable to the uniform strategy as shown in Fig.~\ref{fig.number_non}(a)), it demonstrates a notable privacy protection effect, especially when the number of anchors is relatively small. Through the proposed privacy-constrained optimization framework, the QP-based strategy can effectively balance localization accuracy and privacy preservation, outperforming both the TL and uniform strategies.
+%==========Fig. VS anchor_number non-cooperative ==========
+\begin{figure}
+%\vspace{-10pt}
+\centering
+\subfloat[\footnotesize SPEB]{\includegraphics[scale = 0.5]{figures/SPEB_N_non.eps}} \\
+\subfloat[\footnotesize LSM]{\includegraphics[scale = 0.5]{figures/LSM_N_non.eps}}
+\caption{Non-cooperative localization: system performance vs anchor number.}\label{fig.number_non}
+\vspace{-10pt}
+\end{figure}
+%====================
+
+Fig.~\ref{fig.power_non} presents the performance of various localization strategies in non-cooperative environments, focusing on the impact of total power constraints. In Fig.~\ref{fig.power_non}(a), as expected, increasing the total power improves localization accuracy across all methods. However, the rate of improvement varies depending on the strategy and the constraints applied. The QP-based algorithm demonstrates less degradation in positioning accuracy compared to the other privacy-aware strategies, especially under lower total power conditions, highlighting its efficiency in resource-constrained environments. As shown in Fig.~\ref{fig.power_non}(b), although positioning accuracy improves with increasing total power, the LSM decreases. Under the same setting, the QP-based strategy achieves the highest LSM values among the privacy-aware methods. This indicates that the QP-based method provides the strongest privacy protection while maintaining competitive localization accuracy, demonstrating its effectiveness in managing this trade-off by optimizing power allocation to achieve both high accuracy and robust privacy protection. Although the positioning accuracy of the GD-based method is less satisfactory, it achieves a level of privacy protection comparable to that of the QP-based strategy. Consistent with observations from Fig.~\ref{fig.number_non}, increasing the number of anchors reduces both SPEB and LSM, enhancing localization accuracy while slightly compromising privacy. Conversely, a larger search radius increases positioning error and privacy risks, as reflected in higher SPEB and lower LSM values.
+
+%==========Fig. VS total_power non-cooperative ==========
+\begin{figure}
+%\vspace{-10pt}
+\centering
+\subfloat[\footnotesize SPEB]{\includegraphics[scale = 0.5]{figures/SPEB_P_non.eps}} \\
+\subfloat[\footnotesize LSM]{\includegraphics[scale = 0.5]{figures/LSM_P_non.eps}}
+\caption{Non-cooperative localization: system performance vs total power.}\label{fig.power_non}
+\vspace{-10pt}
+\end{figure}
+%====================
+
+
+Fig.~\ref{fig.threshold} illustrates the impact of varying privacy constraints on positioning accuracy, evaluated under different levels of total transmission power. The figure shows that as privacy requirements become more stringent, positioning errors also increase. When the total power is very low, the impact of increasing the privacy constraint on positioning accuracy is particularly pronounced. This suggests that at low power levels, achieving high localization accuracy while maintaining stringent privacy is extremely challenging. As total power increases, the system can tolerate higher privacy constraints with a relatively smaller increase in SPEB compared to the lowest power level. At higher power levels, the increase in SPEB with increasing $\sigma\emph{}$ is more gradual. This indicates that with sufficient total power, the system can achieve a better balance between localization accuracy and privacy protection. The results underscore a fundamental trade-off between localization accuracy and location privacy. Depending on application requirements, systems can strategically balance these competing goals. In scenarios where privacy is crucial, some loss of positioning accuracy may be necessary to meet strict privacy requirements, especially in sensitive applications. Conversely, in cases like emergency services or precision navigation, high accuracy may require relaxing privacy constraints.
+%In scenarios where privacy is paramount, it is necessary to accept some loss in positioning accuracy to meet stringent privacy requirements. This might be suitable for applications involving sensitive information. Conversely, in applications where high localization accuracy is critical, privacy constraints might need to be relaxed to some extent. This could apply to scenarios such as emergency services or precision navigation where accurate positioning is crucial. %By understanding and managing the trade-off between these factors, systems can be tailored to meet the specific needs of various applications, ensuring both effective localization and robust privacy protection.
+
+%==========Fig. SPEB VS Threshold non-cooperative ==========
+\begin{figure}
+%\vspace{-5pt}
+  \centering
+    \includegraphics[scale = 0.5]{figures/SPEB_Threshold_non.eps}\\
+  \caption{Localization accuracy under different privacy constraints.}\label{fig.threshold}
+\vspace{-10pt}
+\end{figure}
+
+
+\subsection{Cooperative Localization}
+In cooperative localization, the proposed iterative approach for allocating power considers agents as anchors with positional uncertainty. Fig.~\ref{fig.uncertainty} illustrates the relationship between the position uncertainty of agents and the allocated power in a cooperative localization network. From Fig.~\ref{fig.uncertainty}(a), there is a clear inverse relationship between the position uncertainty of an agent and the power allocated to it. Specifically, agents with lower position uncertainty receive more power, enhancing their contribution to the overall localization accuracy. Fig.~\ref{fig.uncertainty}(b) further visualizes the inverse relationship by plotting the power allocated against the inverse of position uncertainty. The power allocation pattern exhibits a similar fluctuation to the changes in $1/\Upsilon_j^t$, reaffirming the inverse proportionality between position uncertainty and allocated power. %The iterative power allocation strategy ensures that agents with more accurate positional information receive more power, enhancing their contribution to the overall localization accuracy.
+
+%==========Fig. power VS delta cooperative ==========
+\begin{figure}
+%\vspace{-10pt}
+\centering
+\subfloat[\footnotesize ]{\includegraphics[scale = 0.5]{figures/bar_delta_power.eps}} \\
+\subfloat[\footnotesize ]{\includegraphics[scale = 0.5]{figures/fig_delta_power.eps}}
+\caption{Allocated power versus the position uncertainty of agents.}\label{fig.uncertainty}
+\vspace{-10pt}
+\end{figure}
+%====================
+
+
+Fig.~\ref{fig.convergence} illustrates the convergence behavior of the gradient-based power allocation solution under different learning rates. The results demonstrate that the algorithm achieves stable convergence across a range of learning rates. Specifically, for a relatively large learning rate of $\alpha_{\rm r} = 0.1$, the algorithm converges rapidly, stabilizing around iteration 20. For moderate learning rates, such as $\alpha_{\rm r} = 0.05$ and $0.01$, the convergence is smooth and gradual, with the algorithm reaching stability around iterations 30 and 40, respectively. When the learning rate is further reduced to $\alpha_{\rm r} = 0.005$, the convergence becomes notably slower, requiring approximately 60 iterations to stabilize. Nevertheless, despite the slower progress, the algorithm consistently converges to the optimal power allocation, demonstrating its effectiveness and robustness even under conservative learning rates.
+
+%==========Fig. convergence ==========
+\begin{figure}
+%\vspace{-10pt}
+ \centering
+   \includegraphics[scale = 0.5]{figures/Convergence.eps}\\
+ \caption{Convergence behavior of the gradient-based solution.}\label{fig.convergence}
+\vspace{-10pt}
+\end{figure}
+
+
+Fig.~\ref{fig.number_coop} demonstrates the performance of various localization algorithms as the number of agents increases in a cooperative localization environment. Different from the change trend caused by increasing the number of anchors in non-cooperative localization shown in Fig.~\ref{fig.number_non}, the SPEB increases with the increase of the number of agents. As illustrated in Fig.~\ref{fig.number_coop}(a), the SPEB gradually increases across all algorithms. This increase can be attributed to the fact that, as more agents participate in the system, power must be distributed among a greater number of entities with varying levels of position certainty. This distribution inherently leads to reduced localization accuracy for each individual agent, as the available resources are spread more thinly. However, despite this general trend of increasing SPEB with the number of agents, the QP-based algorithm still maintains a lower SPEB compared to other strategies. This demonstrates the robustness of the QP-based method in effectively managing multiple agents, even under conditions where localization becomes more challenging due to the increase in agent numbers. From Fig.~\ref{fig.number_coop}(b), the QP-based algorithm, while showing an increase in LSM with the number of agents, still performs better compared to other methods. The results indicate that although managing privacy becomes more challenging with more agents, the QP-based method is more adept at handling these challenges, providing a more secure localization solution even in complex environments with a larger number of agents.
+
+%==========Fig. SPEB vs N_agent cooperative  ==========
+\begin{figure}
+%\vspace{-10pt}
+\centering
+\subfloat[\footnotesize SPEB]{\includegraphics[scale = 0.5]{figures/SPEB_N_coop.eps}}\\
+\subfloat[\footnotesize LSM]{\includegraphics[scale = 0.5]{figures/LSM_N_coop.eps}}
+\caption{Cooperative localization: system performance vs agent number.}\label{fig.number_coop}
+\vspace{-10pt}
+\end{figure}
+
+Fig.~\ref{fig.power_coop} illustrates the impact of varying normalized total power on the SPEB and LSM across different localization algorithms in cooperative localization environments. As shown in Fig.~\ref{fig.power_coop}(a), increasing the total power leads to a reduction in SPEB for all algorithms, as expected. Notably, the QP-based algorithm consistently outperforms the others, achieving a lower SPEB across all power levels. This indicates that the QP-based method is more efficient in utilizing available power to enhance localization accuracy. Additionally, the figure presents results for scenarios with an increased number of anchors. It is observed that increasing the number of anchors further reduces SPEB, consistent with the results in Fig.~\ref{fig.number_non}. This reduction occurs because additional anchors provide more reference points with no position uncertainty, thereby improving overall localization precision. The combination of increased power and additional anchors significantly boosts localization performance, demonstrating the robustness and adaptability of the QP-based algorithm in various cooperative localization scenarios. In Fig.~\ref{fig.power_coop}(b), increasing total power results in decreased LSM values, indicating a degradation in privacy protection. This trend mirrors that observed in non-cooperative localization cases, with the QP-based algorithm continuing to perform best across all settings.

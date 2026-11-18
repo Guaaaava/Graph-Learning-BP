@@ -1,0 +1,11 @@
+# Local environments, caches and editor state
+.venv*/
+.vscode/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Generated data, experiment outputs and release artifacts
+/data/
+/outputs/
+/dist/

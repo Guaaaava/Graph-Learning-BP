@@ -1,0 +1,32 @@
+{
+  "schema": "gib4cl.night-batch.v1",
+  "name": "software-night-fixture",
+  "config": "configs/smoke-pipeline.json",
+  "protocol": "configs/selection/smoke-protocol.json",
+  "device": "cpu",
+  "threads": 1,
+  "budget": {
+    "max_seconds": 120,
+    "max_units": 2,
+    "epochs_per_slice": 1,
+    "unit_estimate_seconds": 1,
+    "estimate_note": "CPU software fixture admission estimate only; not a GPU throughput measurement",
+    "safety_factor": 1.5
+  },
+  "stages": [
+    {
+      "id": "A",
+      "command": "candidates",
+      "options": {
+        "stage": "A"
+      }
+    },
+    {
+      "id": "B",
+      "command": "candidates",
+      "options": {
+        "stage": "B"
+      }
+    }
+  ]
+}
